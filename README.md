@@ -26,7 +26,7 @@ L'objectif de ce projet est de créer une plateforme web moderne et intuitive po
 
 ## Installation
 
-Pour installer ce projet localement, suivez l'étapes suivante :
+Pour installer ce projet localement, suivez l'étape suivante :
 
  **Cloner le dépôt :**
    ```bash
