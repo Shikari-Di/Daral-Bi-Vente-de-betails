@@ -26,8 +26,8 @@ L'objectif de ce projet est de créer une plateforme web moderne et intuitive po
 
 ## Installation
 
-Pour installer et exécuter ce projet localement, suivez les étapes suivantes :
+Pour installer ce projet localement, suivez l'étapes suivante :
 
-1. **Cloner le dépôt :**
+ **Cloner le dépôt :**
    ```bash
    git clone https://github.com/Shikari-Di/Daral-Bi-Vente-De-Bétails.git
