@@ -108,7 +108,8 @@ CREATE TABLE IF NOT EXISTS faq (
 -- Insertion des données initiales
 
 -- Utilisateur
-INSERT INTO utilisateurs (nom, email, numero, mot_de_passe)
+INSERT INTO utilisateurs (nom, email, numero, mot_de_passe) 
+VALUES ('Admin', 'admin@example.com', '770000000', 'password123');
 SELECT * FROM (SELECT 'Admin', 'admin@example.com', '770000000', 'password123') AS tmp
 WHERE NOT EXISTS (
     SELECT 1 FROM utilisateurs WHERE email = 'admin@example.com'
@@ -128,7 +129,7 @@ INSERT INTO localisations (nom)
 VALUES ('Dakar'), ('Thiès'), ('Saint-Louis'), ('Kolda');
 
 -- Annonces
-INSERT INTO annonces (titre, description, prix, poids, age, image, localisation, categorie, race, date_creation)
+INSERT INTO annonces (titre, description, prix, poids, age, image, localisation_id, categorie_id, race_id, utilisateur_id)
 VALUES 
 ('Mouton Ladoum', 'Mouton de race pure, idéal pour Tabaski.', 250000, 45, 18, 'mouton1.jpg', 1, 1, 1, 1),
 ('Vache Bali-Bali', 'Vache robuste et en bonne santé.', 500000, 300, 36, 'vache1.jpg', 2, 2, 2, 1),

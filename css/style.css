@@ -75,6 +75,28 @@ body {
     box-shadow: 0 0 15px rgba(46, 204, 113, 0.3);
 }
 
+/* Bouton Détails */
+.details-button {
+    background-color: #28a745; /* Couleur verte */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+}
+
+.details-button a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.details-button:hover {
+    background-color: #218838; /* Couleur plus foncée au survol */
+}
+
 /* Badges */
 .badge {
     background: #e74c3c;
@@ -1313,6 +1335,36 @@ body {
     background-color: white;
 }
 
+.race-select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #444;
+    font-size: 0.95rem;
+    background-color: white;
+}
+
+.category-select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #444;
+    font-size: 0.95rem;
+    background-color: white;
+}
+
+.apply-filters {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
 /* Contenu des annonces */
 .annonces-content {
     flex: 1;

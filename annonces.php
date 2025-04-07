@@ -2,38 +2,70 @@
 $pageTitle = "Annonces";
 $currentPage = 'annonces';
 include 'components/header.php';
+include 'db.php'; // Inclure la connexion à la base de données
 
-// Exemple de données d'annonces
-$annonces = [
-    ['id' => 1, 'title' => 'Mouton Ladoum de race pure', 'price' => 250000, 'category' => 'mouton', 'location' => 'dakar', 'race' => 'ladoum'],
-    ['id' => 2, 'title' => 'Vache Bali-Bali', 'price' => 300000, 'category' => 'vache', 'location' => 'thies', 'race' => 'bali-bali'],
-    ['id' => 3, 'title' => 'Chevre Touabir', 'price' => 150000, 'category' => 'chevre', 'location' => 'saint-louis', 'race' => 'touabir'],
-];
+$whereClauses = [];
+$params = [];
 
-// Récupérer les filtres
-$categoryFilter = isset($_GET['category']) ? (array)$_GET['category'] : [];
-$priceMin = isset($_GET['price_min']) && is_numeric($_GET['price_min']) ? (int)$_GET['price_min'] : null;
-$priceMax = isset($_GET['price_max']) && is_numeric($_GET['price_max']) ? (int)$_GET['price_max'] : null;
-$locationFilter = isset($_GET['location']) ? (array)$_GET['location'] : [];
-$raceFilter = isset($_GET['race']) ? (array)$_GET['race'] : [];
+// Filtrer par catégorie
+if (!empty($_GET['category'])) {
+    $whereClauses[] = "categorie_id = ?";
+    $params[] = $_GET['category'];
+}
 
-// Filtrer les annonces
-$filteredAnnonces = array_filter($annonces, function($annonce) use ($categoryFilter, $priceMin, $priceMax, $locationFilter, $raceFilter) {
-    if (!empty($categoryFilter) && !in_array($annonce['category'], $categoryFilter)) return false;
-    if ($priceMin !== null && $annonce['price'] < $priceMin) return false;
-    if ($priceMax !== null && $annonce['price'] > $priceMax) return false;
-    if (!empty($locationFilter) && !in_array($annonce['location'], $locationFilter)) return false;
-    if (!empty($raceFilter) && !in_array($annonce['race'], $raceFilter)) return false;
-    return true;
-});
+// Filtrer par prix
+if (!empty($_GET['min_price']) && !empty($_GET['max_price'])) {
+    $whereClauses[] = "prix BETWEEN ? AND ?";
+    $params[] = $_GET['min_price'];
+    $params[] = $_GET['max_price'];
+}
 
-// Options pour les filtres
-$locations = [
-    'dakar' => 'Dakar',
-    'thies' => 'Thiès',
-    'saint-louis' => 'Saint-Louis',
-    'kolda' => 'Kolda'
-];
+// Filtrer par localisation
+if (!empty($_GET['location'])) {
+    $whereClauses[] = "localisation_id = ?";
+    $params[] = $_GET['location'];
+}
+
+// Filtrer par race
+if (!empty($_GET['race'])) {
+    $whereClauses[] = "race_id = ?";
+    $params[] = $_GET['race'];
+}
+
+// Construire la requête SQL
+$sql = "SELECT 
+            annonces.id, 
+            annonces.titre, 
+            annonces.description, 
+            annonces.prix, 
+            annonces.poids, 
+            annonces.age, 
+            annonces.image, 
+            localisations.nom AS localisation, 
+            annonces.date_creation 
+        FROM annonces
+        JOIN localisations ON annonces.localisation_id = localisations.id";
+
+if (!empty($whereClauses)) {
+    $sql .= " WHERE " . implode(' AND ', $whereClauses);
+}
+
+$sql .= " ORDER BY annonces.date_creation DESC";
+
+// Pagination
+$limit = 10; // Nombre d'annonces par page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+$sql .= " LIMIT $limit OFFSET $offset";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$annonces = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Calcul du nombre total d'annonces
+$totalAnnonces = $pdo->query("SELECT COUNT(*) FROM annonces")->fetchColumn();
+$totalPages = ceil($totalAnnonces / $limit);
 ?>
 
 <style>
@@ -111,109 +143,144 @@ $locations = [
                         <a href="annonces.php" class="reset-filters">Réinitialiser</a>
                     <?php endif; ?>
                 </div>
-                <form method="get">
+
+                <form class="filters-form" method="GET">
                     <!-- Catégorie -->
                     <div class="filter-group">
                         <h3>Catégorie</h3>
-                        <div class="filter-options">
-                            <label class="filter-option">
-                                <input type="checkbox" name="category[]" value="mouton" <?= in_array('mouton', $categoryFilter) ? 'checked' : '' ?>>
-                                <span class="checkmark"></span>
-                                Moutons
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="category[]" value="vache" <?= in_array('vache', $categoryFilter) ? 'checked' : '' ?>>
-                                <span class="checkmark"></span>
-                                Vaches
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="category[]" value="chevre" <?= in_array('chevre', $categoryFilter) ? 'checked' : '' ?>>
-                                <span class="checkmark"></span>
-                                Chèvres
-                            </label>
+                        <select name="category" class="category-select">
+                            <option value="">Toutes les catégories</option>
+                            <?php
+                            $categories = $pdo->query("SELECT id, nom FROM categories")->fetchAll(PDO::FETCH_ASSOC);
+                            foreach ($categories as $categorie): ?>
+                                <option value="<?php echo $categorie['id']; ?>" 
+                                    <?php echo (!empty($_GET['category']) && $_GET['category'] == $categorie['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($categorie['nom']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <!-- Prix -->
+                    <div class="filter-group">
+                        <h3>Prix</h3>
+                        <div class="price-range">
+                            <div class="price-inputs">
+                                <input type="number" name="min_price" placeholder="Min" class="price-input">
+                                <span>-</span>
+                                <input type="number" name="max_price" placeholder="Max" class="price-input">
+                            </div>
                         </div>
                     </div>
 
                     <!-- Localisation -->
                     <div class="filter-group">
                         <h3>Localisation</h3>
-                        <div class="filter-options">
-                            <?php foreach ($locations as $value => $label): ?>
-                                <label class="filter-option">
-                                    <input type="checkbox" name="location[]" value="<?= $value ?>" <?= in_array($value, $locationFilter) ? 'checked' : '' ?>>
-                                    <span class="checkmark"></span>
-                                    <?= $label ?>
-                                </label>
+                        <select name="location" class="location-select">
+                            <option value="">Toutes les régions</option>
+                            <?php
+                            $localisations = $pdo->query("SELECT id, nom FROM localisations")->fetchAll(PDO::FETCH_ASSOC);
+                            foreach ($localisations as $localisation): ?>
+                                <option value="<?php echo $localisation['id']; ?>">
+                                    <?php echo htmlspecialchars($localisation['nom']); ?>
+                                </option>
                             <?php endforeach; ?>
-                        </div>
+                        </select>
                     </div>
 
                     <!-- Race -->
                     <div class="filter-group">
                         <h3>Race</h3>
-                        <div class="filter-options">
-                            <label class="filter-option">
-                                <input type="checkbox" name="race[]" value="ladoum" <?= in_array('ladoum', $raceFilter) ? 'checked' : '' ?>>
-                                <span class="checkmark"></span>
-                                Ladoum
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="race[]" value="bali-bali" <?= in_array('bali-bali', $raceFilter) ? 'checked' : '' ?>>
-                                <span class="checkmark"></span>
-                                Bali-Bali
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="race[]" value="touabir" <?= in_array('touabir', $raceFilter) ? 'checked' : '' ?>>
-                                <span class="checkmark"></span>
-                                Touabir
-                            </label>
-                        </div>
+                        <select name="race" class="race-select">
+                            <option value="">Toutes les races</option>
+                            <?php
+                            $races = $pdo->query("SELECT id, nom FROM races")->fetchAll(PDO::FETCH_ASSOC);
+                            foreach ($races as $race): ?>
+                                <option value="<?php echo $race['id']; ?>" 
+                                    <?php echo (!empty($_GET['race']) && $_GET['race'] == $race['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($race['nom']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
 
-                    <!-- Prix -->
-                    <div class="filter-group">
-                        <h3>Prix (FCFA)</h3>
-                        <div class="price-range">
-                            <input type="number" name="price_min" value="<?= $priceMin ?>" placeholder="Min" min="0">
-                            <span>-</span>
-                            <input type="number" name="price_max" value="<?= $priceMax ?>" placeholder="Max" min="0">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-apply">Appliquer</button>
+                    <button type="submit" class="apply-filters">Appliquer les filtres</button>
                 </form>
             </aside>
 
             <!-- Liste des annonces -->
             <div class="annonces-content">
-                <div class="results-count">
-                    <span><?= count($filteredAnnonces) ?> annonce<?= count($filteredAnnonces) > 1 ? 's' : '' ?> trouvée<?= count($filteredAnnonces) > 1 ? 's' : '' ?></span>
+                <div class="annonces-header">
+                    <div class="results-count">
+                        <span><?php echo $totalAnnonces; ?> annonces trouvées</span>
+                    </div>
                 </div>
-                
-                <?php if(empty($filteredAnnonces)): ?>
-                    <div class="no-results">
-                        <p>Aucune annonce ne correspond à vos critères.</p>
-                    </div>
-                <?php else: ?>
-                    <div class="listings-grid">
-                        <?php foreach ($filteredAnnonces as $annonce): ?>
-                        <div class="listing-card">
-                            <div class="listing-image">
-                                <img src="assets/images/animal<?= $annonce['id'] ?>.jpg" alt="<?= htmlspecialchars($annonce['title']) ?>">
+
+                <div class="listings-grid">
+                    <?php if (!empty($annonces)): ?>
+                        <?php foreach ($annonces as $annonce): ?>
+                            <div class="listing-card">
+                                <div class="listing-image">
+                                    <?php 
+                                    $imagePath = "assets/images/" . htmlspecialchars($annonce['image']);
+                                    if (!file_exists($imagePath)) {
+                                        $imagePath = "assets/images/default.jpg"; // Image par défaut
+                                    }
+                                    ?>
+                                    <img src="<?php echo $imagePath; ?>" alt="<?php echo htmlspecialchars($annonce['titre']); ?>">
+                                    <form action="ajouter_favori.php" method="POST">
+                                        <input type="hidden" name="annonce_id" value="<?php echo $annonce['id']; ?>">
+                                        <button type="submit" class="favorite-btn" title="Ajouter aux favoris">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="listing-content">
+                                    <h3 class="listing-title"><?php echo htmlspecialchars($annonce['titre']); ?></h3>
+                                    <div class="listing-price"><?php echo number_format($annonce['prix'], 0, ',', ' '); ?> FCFA</div>
+                                    <button class="details-button">
+                                        <a href="detail-produit.php?id=<?php echo $annonce['id']; ?>">Détails</a>
+                                    </button>
+                                    <div class="listing-footer">
+                                        <div class="listing-location">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <?php echo htmlspecialchars($annonce['localisation']); ?>
+                                        </div>
+                                        <div class="listing-date">
+                                            <?php echo date('d/m/Y', strtotime($annonce['date_creation'])); ?>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="listing-content">
-                                <h3 class="listing-title"><?= htmlspecialchars($annonce['title']) ?></h3>
-                                <div class="listing-price"><?= number_format($annonce['price'], 0, ',', ' ') ?> FCFA</div>
-                                <div class="listing-location"><?= $locations[$annonce['location']] ?? $annonce['location'] ?></div>
-                            </div>
-                        </div>
                         <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
+                    <?php else: ?>
+                        <p>Aucune annonce trouvée.</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination">
+                    <?php if ($page > 1): ?>
+                        <a href="?page=<?php echo $page - 1; ?>" class="page-btn prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?page=<?php echo $i; ?>" class="page-btn <?php echo ($i === $page) ? 'active' : ''; ?>">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $totalPages): ?>
+                        <a href="?page=<?php echo $page + 1; ?>" class="page-btn next">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
 <?php include 'components/footer.php'; ?>
-

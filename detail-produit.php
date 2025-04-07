@@ -2,13 +2,46 @@
 $pageTitle = "Détail Produit";
 $currentPage = 'annonces';
 include 'components/header.php';
-?>
+include 'config/database.php'; // Fichier de connexion à la base de données
 
+$productID = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+try {
+    $query = $pdo->prepare("
+        SELECT 
+            annonces.*, 
+            localisations.nom AS localisation, 
+            categories.nom AS categorie, 
+            races.nom AS race, 
+            utilisateurs.nom AS vendeur, 
+            utilisateurs.numero AS telephone
+        FROM annonces
+        INNER JOIN localisations ON annonces.localisation_id = localisations.id
+        INNER JOIN categories ON annonces.categorie_id = categories.id
+        INNER JOIN races ON annonces.race_id = races.id
+        INNER JOIN utilisateurs ON annonces.utilisateur_id = utilisateurs.id
+        WHERE annonces.id = :id
+    ");
+    $query->bindParam(':id', $productID, PDO::PARAM_INT);
+    $query->execute();
+    $product = $query->fetch(PDO::FETCH_ASSOC);
+
+    if (!$product) {
+        echo "<p>Produit non disponible.</p>";
+        include 'components/footer.php';
+        exit;
+    }
+} catch (PDOException $e) {
+    echo "<p>Erreur : " . $e->getMessage() . "</p>";
+    include 'components/footer.php';
+    exit;
+}
+?>
 <section class="product-detail">
     <div class="container">
         <div class="product-image-column">
             <div class="main-image-container">
-                <img src="path/to/sheep.jpg" alt="Mouton" class="main-image">
+                <img src="assets/images/<?php echo htmlspecialchars($product['image']); ?>" alt="<?php echo htmlspecialchars($product['titre']); ?>" class="main-image">
                 <button class="favorite-button">
                     <i class="fas fa-heart"></i>
                 </button>
@@ -17,59 +50,50 @@ include 'components/header.php';
 
         <div class="product-info-column">
             <div class="product-header">
-                <h1 class="product-title">Mouton</h1>
-                <span class="product-status">Disponible</span>
+                <h1 class="product-title"><?php echo htmlspecialchars($product['titre']); ?></h1>
+                <span class="product-status">Publié par : <?php echo htmlspecialchars($product['vendeur']); ?></span>
+                
             </div>
 
+            <div>
+                <span class="product-phone">Contact : <?php echo htmlspecialchars($product['telephone']); ?></span>
+            </div>
+            
             <div class="product-price">
-                <span class="price-amount">FCFA 250.000</span>
+                <span class="price-amount">FCFA <?php echo number_format($product['prix'], 0, ',', ' '); ?></span>
             </div>
 
             <div class="product-location">
                 <i class="fas fa-map-marker-alt"></i>
-                <span>Kolda</span>
+                <span><?php echo htmlspecialchars($product['localisation']); ?></span>
             </div>
 
             <div class="product-description">
                 <h3>Description</h3>
-                <div class="description-list">
-                    <div class="description-item">
-                        <span class="icon">🐑</span>
-                        <span class="label">Race :</span>
-                        <span class="value">Ladoum</span>
-                    </div>
-                    <div class="description-item">
-                        <span class="icon">📅</span>
-                        <span class="label">Age :</span>
-                        <span class="value">2 ans</span>
-                    </div>
-                    <div class="description-item">
-                        <span class="icon">⚖️</span>
-                        <span class="label">Poids :</span>
-                        <span class="value">80 kg</span>
-                    </div>
-                    <div class="description-item">
-                        <span class="icon">🌿</span>
-                        <span class="label">Alimentation :</span>
-                        <span class="value">Naturelle</span>
-                    </div>
-                    <div class="description-item">
-                        <span class="icon">💉</span>
-                        <span class="label">État de santé :</span>
-                        <span class="value">Excellent, tous vaccins à jour</span>
-                    </div>
-                </div>
+                <p><?php echo nl2br(htmlspecialchars($product['description'])); ?></p>
             </div>
 
-            <div class="product-actions">
-                <button class="buy-button">
-                    <i class="fas fa-shopping-cart"></i>
-                    Acheter maintenant
-                </button>
-                <button class="contact-button">
-                    <i class="fas fa-envelope"></i>
-                    Contacter le vendeur
-                </button>
+            <div class="product-details">
+                <div class="description-item">
+                    <span class="icon">📅</span>
+                    <span class="label">Âge :</span>
+                    <span class="value"><?php echo htmlspecialchars($product['age']); ?> mois</span>
+                </div>
+                <div class="description-item">
+                    <span class="icon">⚖️</span>
+                    <span class="label">Poids :</span>
+                    <span class="value"><?php echo htmlspecialchars($product['poids']); ?> kg</span>
+                </div>
+                <div class="description-item">
+                    <span class="icon">🐑</span>
+                    <span class="label">Race :</span>
+                    <span class="value"><?php echo htmlspecialchars($product['race']); ?></span>
+                </div>
+                <div class="description-item">
+                    <span class="icon">📂</span>
+                    <span class="label">Catégorie :</span>
+                    <span class="value"><?php echo htmlspecialchars($product['categorie']); ?></span>
+                </div>
             </div>
         </div>
     </div>
@@ -138,10 +162,12 @@ include 'components/header.php';
 </section>
 
 <div class="return-home">
-    <a href="/" class="return-button">
+    <a href="index.php" class="return-button">
         <i class="fas fa-arrow-left"></i>
         Retour à l'accueil
     </a>
 </div>
 
-<?php include 'components/footer.php'; ?>
+<?php 
+include 'components/footer.php'; 
+?>
