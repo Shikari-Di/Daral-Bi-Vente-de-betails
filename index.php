@@ -74,7 +74,7 @@ include 'components/header.php';
     <h2 class="section-title">Ce que disent nos clients</h2>
     <div class="testimonials-grid">
         <div class="testimonial-card">
-            <img src="path/to/client1.jpg" alt="Client 1" class="client-image">
+            <img src="img\mamadoudiallo.png" alt="Client 1" class="client-image">
             <p class="testimonial-text">"Excellent service ! J'ai trouvé exactement ce que je cherchais."</p>
             <p class="client-name">Mamadou Diallo</p>
             <p class="client-location">Dakar</p>
@@ -86,7 +86,7 @@ include 'components/header.php';
             <p class="client-location">Saint-Louis</p>
         </div>
         <div class="testimonial-card">
-            <img src="path/to/client3.jpg" alt="Client 3" class="client-image">
+            <img src="img\ousmanefaye.png" alt="Client 3" class="client-image">
             <p class="testimonial-text">"Je recommande vivement Daaral Bi !"</p>
             <p class="client-name">Ousmane Fall</p>
             <p class="client-location">Thiès</p>
