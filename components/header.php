@@ -11,7 +11,7 @@
     <header class="header">
         <div class="container">
             <a href="index.php" class="logo">
-                <img src="assets/images/logo.png" alt="Daraal Bi Logo" class="logo-img">
+                <img src="img/DaraalBILogo.jpeg" alt="Daraal Bi Logo" class="logo-img">
             </a>
 
             <div class="search-bar">
@@ -41,14 +41,30 @@
                         </ul>
                     </li>
                     <li><a href="annonces.php" class="nav-link <?php echo ($currentPage === 'annonces') ? 'active' : ''; ?>">Annonces</a></li>
-                    <li><a href="temoignages.php" class="nav-link <?php echo ($currentPage === 'temoignages') ? 'active' : ''; ?>">Témoignages</a></li>
+                    <li><a href="temoignages.php" class="nav-link <?php echo ($currentPage === 'temoignages') ? 'active' : ''; ?>">Avis & commentaires</a></li>
                     <li><a href="contact.php" class="nav-link <?php echo ($currentPage === 'contact') ? 'active' : ''; ?>">Contact</a></li>
                     <li><a href="login.php" class="nav-link connect-button">Connexion</a></li>
                 </ul>
-
             </nav>
         </div>
     </header>
 
+    <script>
+        // Menu mobile toggle
+        document.querySelector('.menu-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+
+        // Gestion des dropdowns
+        document.querySelectorAll('.dropdown').forEach(dropdown => {
+            dropdown.addEventListener('click', function(e) {
+                if (window.innerWidth < 768) {
+                    e.preventDefault();
+                    this.classList.toggle('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
