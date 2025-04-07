@@ -94,15 +94,15 @@ $order = [
                     <div class="method-content">
                         <div class="mobile-operators">
                             <button class="operator-btn active" data-operator="orange">
-                                <img src="assets/images/orange-money.png" alt="Orange Money">
+                                <img src="images/orange_money.jpeg" alt="Orange Money">
                                 Orange Money
                             </button>
                             <button class="operator-btn" data-operator="wave">
-                                <img src="assets/images/wave.png" alt="Wave">
+                                <img src="images/wave.png" alt="Wave">
                                 Wave
                             </button>
                             <button class="operator-btn" data-operator="free">
-                                <img src="assets/images/free-money.png" alt="Free Money">
+                                <img src="images/free_money.png" alt="Free Money">
                                 Free Money
                             </button>
                         </div>
