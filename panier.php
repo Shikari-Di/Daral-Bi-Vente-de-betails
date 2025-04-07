@@ -12,13 +12,7 @@ $cartItems = [
         'price' => 250000,
         'quantity' => 1
     ],
-    [
-        'id' => '12346',
-        'product_name' => 'Boeuf',
-        'seller' => 'Éleveur B',
-        'price' => 500000,
-        'quantity' => 2
-    ]
+    
 ];
 
 $total = 0;

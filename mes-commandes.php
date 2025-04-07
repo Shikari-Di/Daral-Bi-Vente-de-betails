@@ -10,15 +10,9 @@ $orders = [
         'product_name' => 'Mouton Ladoum',
         'seller' => 'Éleveur Exemple',
         'price' => 250000,
-        'status' => 'Livré'
+        'status' => 'Livraison en cours'
     ],
-    [
-        'id' => '12346',
-        'product_name' => 'Boeuf',
-        'seller' => 'Éleveur B',
-        'price' => 500000,
-        'status' => 'En cours de livraison'
-    ]
+    
 ];
 ?>
 
