@@ -11,7 +11,7 @@
     <header class="header">
         <div class="container">
             <a href="index.php" class="logo">
-                <img src="assets/images/logo.png" alt="Daraal Bi Logo" class="logo-img">
+                <img src="img\DaraalBILogo.jpeg" alt="Daraal Bi Logo" class="logo-img">
             </a>
 
             <div class="search-bar">
