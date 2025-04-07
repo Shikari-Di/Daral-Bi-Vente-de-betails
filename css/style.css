@@ -1313,6 +1313,36 @@ body {
     background-color: white;
 }
 
+.race-select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #444;
+    font-size: 0.95rem;
+    background-color: white;
+}
+
+.category-select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #444;
+    font-size: 0.95rem;
+    background-color: white;
+}
+
+.apply-filters {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
 /* Contenu des annonces */
 .annonces-content {
     flex: 1;

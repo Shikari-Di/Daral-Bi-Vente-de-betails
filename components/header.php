@@ -15,10 +15,12 @@
             </a>
 
             <div class="search-bar">
-                <input type="text" placeholder="Rechercher un animal..." class="search-input">
-                <button type="submit" class="search-button">
-                    <i class="fas fa-search"></i>
-                </button>
+                <form action="recherche.php" method="GET">
+                    <input type="text" name="query" placeholder="Rechercher un animal..." class="search-input">
+                    <button type="submit" class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
             </div>
 
             <button class="menu-toggle">
@@ -49,4 +51,4 @@
     </header>
 
 </body>
-</html> 
+</html>
