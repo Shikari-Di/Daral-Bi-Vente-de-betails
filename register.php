@@ -7,7 +7,7 @@ include 'components/header.php';
 <div class="auth-page">
     <div class="container">
         <div class="auth-box">
-            <h1>Créer un compte</h1>
+            <h1>Inscription</h1>
             
             <div class="account-type-selector">
                 <button type="button" class="account-type-btn active" data-type="client">
@@ -26,13 +26,13 @@ include 'components/header.php';
                 <input type="hidden" name="account_type" id="account_type" value="client">
                 
                 <div class="form-group">
-                    <label for="fullname">Nom complet</label>
-                    <input type="text" id="fullname" name="fullname" required class="form-input">
+                    <label for="name">Nom complet</label>
+                    <input type="text" id="name" name="name" class="form-input" required>
                 </div>
 
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required class="form-input">
+                    <input type="email" id="email" name="email" class="form-input" required>
                 </div>
 
                 <div class="form-group">
@@ -61,7 +61,7 @@ include 'components/header.php';
                 <div class="form-group">
                     <label for="password">Mot de passe</label>
                     <div class="password-input-group">
-                        <input type="password" id="password" name="password" required class="form-input">
+                        <input type="password" id="password" name="password" class="form-input" required>
                         <button type="button" class="toggle-password">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -71,40 +71,25 @@ include 'components/header.php';
                 <div class="form-group">
                     <label for="confirm_password">Confirmer le mot de passe</label>
                     <div class="password-input-group">
-                        <input type="password" id="confirm_password" name="confirm_password" required class="form-input">
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-input" required>
                         <button type="button" class="toggle-password">
                             <i class="fas fa-eye"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="form-group terms-checkbox">
+                <div class="terms-checkbox">
                     <label class="checkbox-label">
                         <input type="checkbox" name="terms" required>
-                        <span>J'accepte les <a href="conditions-generales.php">conditions générales</a></span>
+                        J'accepte les <a href="terms.php">conditions générales</a>
                     </label>
                 </div>
                 
-                <button type="submit" class="btn-primary btn-block">Créer mon compte</button>
+                <button type="submit" class="btn-primary btn-block">S'inscrire</button>
             </form>
 
-            <div class="auth-separator">
-                <span>ou</span>
-            </div>
-
-            <div class="social-auth">
-                <button class="btn-social btn-facebook">
-                    <i class="fab fa-facebook-f"></i>
-                    Continuer avec Facebook
-                </button>
-                <button class="btn-social btn-google">
-                    <i class="fab fa-google"></i>
-                    Continuer avec Google
-                </button>
-            </div>
-
             <div class="auth-footer">
-                <p>Déjà inscrit ? <a href="login.php">Se connecter</a></p>
+                <p>Vous avez déjà un compte ? <a href="login.php">Connectez-vous</a></p>
             </div>
         </div>
     </div>

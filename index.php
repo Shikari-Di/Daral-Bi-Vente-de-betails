@@ -11,11 +11,11 @@ include 'components/header.php';
     </p>
     <p class="hero-tagline">DAARAL BI, le bétail à portée de clics !</p>
     <div class="hero-buttons">
-        <a href="/acheter" class="button button-primary">
+        <a href="annonces.php" class="button button-primary">
             <i class="fas fa-shopping-cart"></i>
             Acheter maintenant
         </a>
-        <a href="/devenir-vendeur" class="button button-secondary">
+        <a href="devenir-vendeur.php" class="button button-secondary">
             <i class="fas fa-store"></i>
             Devenir vendeur
         </a>
@@ -23,19 +23,14 @@ include 'components/header.php';
 </section>
 
 <section class="popular-listings">
-    <div class="container">
-        <div class="section-header">
-            <h1 class="section-title">Annonces Populaires</h1>
-            <p class="section-description">
-                Découvrez notre sélection des meilleures offres de bétail, choisies pour leur qualité exceptionnelle et leur excellent rapport qualité-prix.
-            </p>
-        </div>
+    <h1>Annonces Populaires</h1>
+    <p>Découvrez notre sélection des meilleures offres de bétail, choisies pour leur qualité exceptionnelle et leur excellent rapport qualité-prix.</p>
 
-        <div class="listings-grid">
-            <?php for($i = 1; $i <= 6; $i++): ?>
+    <div class="listings-grid">
+        <?php for($i = 1; $i <= 4; $i++): ?>
             <div class="listing-card">
                 <div class="listing-image">
-                    <img src="assets/images/animal<?= $i ?>.jpg" alt="Animal <?= $i ?>">
+                    <img src="img/Animal <?= $i ?>" alt="Animal <?= $i ?>">
                     <span class="listing-badge">Populaire</span>
                 </div>
                 <div class="listing-content">
@@ -65,8 +60,7 @@ include 'components/header.php';
                     </div>
                 </div>
             </div>
-            <?php endfor; ?>
-        </div>
+        <?php endfor; ?>
     </div>
 </section>
 
@@ -90,6 +84,35 @@ include 'components/header.php';
             <p class="testimonial-text">"Je recommande vivement Daaral Bi !"</p>
             <p class="client-name">Ousmane Fall</p>
             <p class="client-location">Thiès</p>
+        </div>
+    </div>
+</section>
+
+<!-- Section des avantages -->
+<section class="features-section">
+    <div class="features-container">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <img src="img/secure-payment.jpg" alt="Sécurité Garantie">
+            </div>
+            <h3 class="feature-title">Sécurité Garantie</h3>
+            <p class="feature-description">Transactions sécurisées et protection des données</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <img src="img/fast-delivery.jpg" alt="Livraison Rapide">
+            </div>
+            <h3 class="feature-title">Livraison Rapide</h3>
+            <p class="feature-description">Service de livraison fiable et efficace</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <img src="img/customer-support.jpg" alt="Support 24/7">
+            </div>
+            <h3 class="feature-title">Support 24/7</h3>
+            <p class="feature-description">Assistance clientèle disponible à tout moment</p>
         </div>
     </div>
 </section>
