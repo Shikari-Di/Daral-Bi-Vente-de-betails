@@ -9,6 +9,14 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
     email VARCHAR(150) UNIQUE NOT NULL,
     numero VARCHAR(9),
     mot_de_passe VARCHAR(255) NOT NULL,
+    type_compte ENUM('client', 'vendeur') NOT NULL DEFAULT 'client',
+    nom_entreprise VARCHAR(100),
+    adresse_entreprise VARCHAR(255),
+    numero_ninea VARCHAR(50),
+    remember_token VARCHAR(100),
+    token_expiry DATETIME,
+    reset_token VARCHAR(100),
+    reset_token_expiry DATETIME,
     date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -102,6 +110,11 @@ CREATE TABLE IF NOT EXISTS faq (
 -- Utilisateur
 INSERT INTO utilisateurs (nom, email, numero, mot_de_passe) 
 VALUES ('Admin', 'admin@example.com', '770000000', 'password123');
+SELECT * FROM (SELECT 'Admin', 'admin@example.com', '770000000', 'password123') AS tmp
+WHERE NOT EXISTS (
+    SELECT 1 FROM utilisateurs WHERE email = 'admin@example.com'
+) LIMIT 1;
+
 
 -- Catégories
 INSERT INTO categories (nom) 

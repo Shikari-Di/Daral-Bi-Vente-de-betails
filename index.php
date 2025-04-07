@@ -1,7 +1,16 @@
-<?php 
+<?php
+session_start();
+
 $pageTitle = "Accueil";
 $currentPage = 'home';
 include 'components/header.php';
+
+$cartItems = $_SESSION['cart'] ?? [];
+
+$total = 0;
+foreach ($cartItems as $item) {
+    $total += $item['price'] * $item['quantity'];
+}
 ?>
 
 <section class="hero">
@@ -15,7 +24,7 @@ include 'components/header.php';
             <i class="fas fa-shopping-cart"></i>
             Acheter maintenant
         </a>
-        <a href="devenir-vendeur.php" class="button button-secondary">
+        <a href="login.php?from=vendor" class="button button-secondary">
             <i class="fas fa-store"></i>
             Devenir vendeur
         </a>
@@ -23,14 +32,19 @@ include 'components/header.php';
 </section>
 
 <section class="popular-listings">
-    <h1>Annonces Populaires</h1>
-    <p>Découvrez notre sélection des meilleures offres de bétail, choisies pour leur qualité exceptionnelle et leur excellent rapport qualité-prix.</p>
+    <div class="container">
+        <div class="section-header">
+            <h1 class="section-title">Annonces Populaires</h1>
+            <p class="section-description">
+                Découvrez notre sélection des meilleures offres de bétail, choisies pour leur qualité exceptionnelle et leur excellent rapport qualité-prix.
+            </p>
+        </div>
 
-    <div class="listings-grid">
-        <?php for($i = 1; $i <= 4; $i++): ?>
+        <div class="listings-grid">
+            <?php for($i = 1; $i <= 6; $i++): ?>
             <div class="listing-card">
                 <div class="listing-image">
-                    <img src="img/Animal <?= $i ?>" alt="Animal <?= $i ?>">
+                    <img src="assets/images/animal<?= $i ?>.jpg" alt="Animal <?= $i ?>">
                     <span class="listing-badge">Populaire</span>
                 </div>
                 <div class="listing-content">
@@ -50,6 +64,16 @@ include 'components/header.php';
                             Dakar, Sénégal
                         </div>
                         <div class="listing-actions">
+                            <form action="panier.php" method="post">
+                                <input type="hidden" name="product_id" value="<?= $i ?>">
+                                <input type="hidden" name="product_name" value="Mouton Ladoum de race pure">
+                                <input type="hidden" name="seller" value="Éleveur Exemple">
+                                <input type="hidden" name="price" value="250000">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="action-btn" title="Ajouter au Panier">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </form>
                             <button class="action-btn" title="Ajouter aux favoris">
                                 <i class="far fa-heart"></i>
                             </button>
@@ -60,7 +84,8 @@ include 'components/header.php';
                     </div>
                 </div>
             </div>
-        <?php endfor; ?>
+            <?php endfor; ?>
+        </div>
     </div>
 </section>
 
@@ -68,19 +93,19 @@ include 'components/header.php';
     <h2 class="section-title">Ce que disent nos clients</h2>
     <div class="testimonials-grid">
         <div class="testimonial-card">
-            <img src="path/to/client1.jpg" alt="Client 1" class="client-image">
+            <img src="img\mamadoudiallo.png" alt="Client 1" class="client-image">
             <p class="testimonial-text">"Excellent service ! J'ai trouvé exactement ce que je cherchais."</p>
             <p class="client-name">Mamadou Diallo</p>
             <p class="client-location">Dakar</p>
         </div>
         <div class="testimonial-card">
-            <img src="path/to/client2.jpg" alt="Client 2" class="client-image">
+            <img src="img\fatimasow.png" alt="Client 2" class="client-image">
             <p class="testimonial-text">"Plateforme très fiable et professionnelle."</p>
             <p class="client-name">Fatou Sow</p>
             <p class="client-location">Saint-Louis</p>
         </div>
         <div class="testimonial-card">
-            <img src="path/to/client3.jpg" alt="Client 3" class="client-image">
+            <img src="img\ousmanefaye.png" alt="Client 3" class="client-image">
             <p class="testimonial-text">"Je recommande vivement Daaral Bi !"</p>
             <p class="client-name">Ousmane Fall</p>
             <p class="client-location">Thiès</p>
@@ -88,33 +113,90 @@ include 'components/header.php';
     </div>
 </section>
 
-<!-- Section des avantages -->
-<section class="features-section">
-    <div class="features-container">
-        <div class="feature-card">
-            <div class="feature-icon">
-                <img src="img/secure-payment.jpg" alt="Sécurité Garantie">
-            </div>
-            <h3 class="feature-title">Sécurité Garantie</h3>
-            <p class="feature-description">Transactions sécurisées et protection des données</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon">
-                <img src="img/fast-delivery.jpg" alt="Livraison Rapide">
-            </div>
-            <h3 class="feature-title">Livraison Rapide</h3>
-            <p class="feature-description">Service de livraison fiable et efficace</p>
-        </div>
-
-        <div class="feature-card">
-            <div class="feature-icon">
-                <img src="img/customer-support.jpg" alt="Support 24/7">
-            </div>
-            <h3 class="feature-title">Support 24/7</h3>
-            <p class="feature-description">Assistance clientèle disponible à tout moment</p>
-        </div>
-    </div>
-</section>
-
 <?php include 'components/footer.php'; ?>
+
+<style>
+.user-profile-bar {
+    background-color: #f8f9fa;
+    padding: 15px 0;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.profile-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-email {
+    font-weight: 500;
+    color: #333;
+}
+
+.social-auth {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-social {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.btn-social:hover {
+    opacity: 0.9;
+}
+
+.btn-social i {
+    margin-right: 8px;
+}
+
+.btn-facebook {
+    background-color: #3b5998;
+}
+
+.btn-google {
+    background-color: #db4437;
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    color: #dc3545;
+    font-size: 14px;
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.btn-logout:hover {
+    opacity: 0.9;
+}
+
+.btn-logout i {
+    margin-right: 8px;
+}
+</style>

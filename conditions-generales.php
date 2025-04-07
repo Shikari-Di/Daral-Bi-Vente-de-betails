@@ -87,8 +87,101 @@ include 'components/header.php';
                 <p>Dernière mise à jour : <?php echo date('d/m/Y'); ?></p>
                 <p>Pour toute question concernant nos conditions générales, contactez-nous à <a href="mailto:contact@daaralbi.sn">contact@daaralbi.sn</a></p>
             </div>
+
+            <div class="terms-acceptance">
+                <form action="process-accept-terms.php" method="POST" class="acceptance-form" id="acceptanceForm">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="accept-terms" required>
+                        <label for="accept-terms">J'ai lu et j'accepte les conditions générales d'utilisation</label>
+                    </div>
+                    <input type="hidden" name="form_data" id="savedFormData">
+                    <button type="submit" class="btn-primary" id="continue-button" disabled>
+                        Continuer l'inscription
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+.terms-acceptance {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.acceptance-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.checkbox-wrapper label {
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    padding: 12px 24px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #218838;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('accept-terms');
+    const continueButton = document.getElementById('continue-button');
+    const savedFormData = document.getElementById('savedFormData');
+    const form = document.getElementById('acceptanceForm');
+
+    // Récupérer les données sauvegardées du sessionStorage
+    const registerData = sessionStorage.getItem('registerFormData');
+    if (registerData) {
+        savedFormData.value = registerData;
+    }
+
+    checkbox.addEventListener('change', function() {
+        continueButton.disabled = !this.checked;
+    });
+
+    form.addEventListener('submit', function(e) {
+        if (!checkbox.checked) {
+            e.preventDefault();
+            return;
+        }
+    });
+});
+</script>
 
 <?php include 'components/footer.php'; ?> 
