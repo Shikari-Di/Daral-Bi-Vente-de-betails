@@ -9,6 +9,14 @@ CREATE TABLE IF NOT EXISTS utilisateurs (
     email VARCHAR(150) UNIQUE NOT NULL,
     numero VARCHAR(9),
     mot_de_passe VARCHAR(255) NOT NULL,
+    type_compte ENUM('client', 'vendeur') NOT NULL DEFAULT 'client',
+    nom_entreprise VARCHAR(100),
+    adresse_entreprise VARCHAR(255),
+    numero_ninea VARCHAR(50),
+    remember_token VARCHAR(100),
+    token_expiry DATETIME,
+    reset_token VARCHAR(100),
+    reset_token_expiry DATETIME,
     date_inscription TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -100,8 +108,12 @@ CREATE TABLE IF NOT EXISTS faq (
 -- Insertion des données initiales
 
 -- Utilisateur
-INSERT INTO utilisateurs (nom, email, numero, mot_de_passe) 
-VALUES ('Admin', 'admin@example.com', '770000000', 'password123');
+INSERT INTO utilisateurs (nom, email, numero, mot_de_passe)
+SELECT * FROM (SELECT 'Admin', 'admin@example.com', '770000000', 'password123') AS tmp
+WHERE NOT EXISTS (
+    SELECT 1 FROM utilisateurs WHERE email = 'admin@example.com'
+) LIMIT 1;
+
 
 -- Catégories
 INSERT INTO categories (nom) 
@@ -116,7 +128,7 @@ INSERT INTO localisations (nom)
 VALUES ('Dakar'), ('Thiès'), ('Saint-Louis'), ('Kolda');
 
 -- Annonces
-INSERT INTO annonces (titre, description, prix, poids, age, image, localisation_id, categorie_id, race_id, utilisateur_id)
+INSERT INTO annonces (titre, description, prix, poids, age, image, localisation, categorie, race, date_creation)
 VALUES 
 ('Mouton Ladoum', 'Mouton de race pure, idéal pour Tabaski.', 250000, 45, 18, 'mouton1.jpg', 1, 1, 1, 1),
 ('Vache Bali-Bali', 'Vache robuste et en bonne santé.', 500000, 300, 36, 'vache1.jpg', 2, 2, 2, 1),

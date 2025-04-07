@@ -11,11 +11,11 @@ include 'components/header.php';
     </p>
     <p class="hero-tagline">DAARAL BI, le bétail à portée de clics !</p>
     <div class="hero-buttons">
-        <a href="/acheter" class="button button-primary">
+        <a href="annonces.php" class="button button-primary">
             <i class="fas fa-shopping-cart"></i>
             Acheter maintenant
         </a>
-        <a href="/devenir-vendeur" class="button button-secondary">
+        <a href="login.php?from=vendor" class="button button-secondary">
             <i class="fas fa-store"></i>
             Devenir vendeur
         </a>
@@ -95,3 +95,89 @@ include 'components/header.php';
 </section>
 
 <?php include 'components/footer.php'; ?>
+
+<style>
+.user-profile-bar {
+    background-color: #f8f9fa;
+    padding: 15px 0;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.profile-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-email {
+    font-weight: 500;
+    color: #333;
+}
+
+.social-auth {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-social {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.btn-social:hover {
+    opacity: 0.9;
+}
+
+.btn-social i {
+    margin-right: 8px;
+}
+
+.btn-facebook {
+    background-color: #3b5998;
+}
+
+.btn-google {
+    background-color: #db4437;
+}
+
+.btn-logout {
+    display: flex;
+    align-items: center;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    color: #dc3545;
+    font-size: 14px;
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.btn-logout:hover {
+    opacity: 0.9;
+}
+
+.btn-logout i {
+    margin-right: 8px;
+}
+</style>
