@@ -2,6 +2,34 @@
 $pageTitle = "Annonces";
 $currentPage = 'annonces';
 include 'components/header.php';
+
+// Données simulées
+$annonces = [
+    ['id' => 1, 'categorie' => 'mouton', 'race' => 'ladoum', 'prix' => 250000, 'region' => 'dakar', 'poids' => 45, 'age' => 18, 'image' => 'animal1.jpg'],
+    ['id' => 2, 'categorie' => 'vache', 'race' => 'bali-bali', 'prix' => 400000, 'region' => 'kolda', 'poids' => 300, 'age' => 36, 'image' => 'animal2.jpg'],
+    ['id' => 3, 'categorie' => 'chevre', 'race' => 'touabir', 'prix' => 150000, 'region' => 'thies', 'poids' => 35, 'age' => 12, 'image' => 'animal3.jpg'],
+    ['id' => 4, 'categorie' => 'mouton', 'race' => 'ladoum', 'prix' => 300000, 'region' => 'dakar', 'poids' => 50, 'age' => 24, 'image' => 'animal4.jpg'],
+    // ... ajoute d'autres annonces si tu veux
+];
+
+// Récupération des filtres
+$filtreCategorie = $_GET['category'] ?? [];
+$filtreRace = $_GET['race'] ?? [];
+$filtreMinPrix = $_GET['min'] ?? null;
+$filtreMaxPrix = $_GET['max'] ?? null;
+$filtreRegion = $_GET['region'] ?? '';
+
+// Filtrage des annonces
+$annoncesFiltrees = array_filter($annonces, function ($annonce) use (
+    $filtreCategorie, $filtreRace, $filtreMinPrix, $filtreMaxPrix, $filtreRegion
+) {
+    if ($filtreCategorie && !in_array($annonce['categorie'], $filtreCategorie)) return false;
+    if ($filtreRace && !in_array($annonce['race'], $filtreRace)) return false;
+    if ($filtreMinPrix && $annonce['prix'] < $filtreMinPrix) return false;
+    if ($filtreMaxPrix && $annonce['prix'] > $filtreMaxPrix) return false;
+    if ($filtreRegion && $annonce['region'] !== $filtreRegion) return false;
+    return true;
+});
 ?>
 
 <section class="annonces-page">
@@ -18,148 +46,81 @@ include 'components/header.php';
             <aside class="filters-sidebar">
                 <div class="filters-header">
                     <h2>Filtres</h2>
-                    <button class="reset-filters">
-                        <i class="fas fa-redo-alt"></i>
-                        Réinitialiser
-                    </button>
                 </div>
 
-                <form class="filters-form">
+                <form class="filters-form" method="GET" action="annonces.php">
                     <!-- Catégorie -->
                     <div class="filter-group">
                         <h3>Catégorie</h3>
-                        <div class="filter-options">
-                            <label class="filter-option">
-                                <input type="checkbox" name="category" value="mouton">
-                                <span class="checkbox-custom"></span>
-                                Moutons
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="category" value="vache">
-                                <span class="checkbox-custom"></span>
-                                Vaches
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="category" value="chevre">
-                                <span class="checkbox-custom"></span>
-                                Chèvres
-                            </label>
-                        </div>
+                        <label><input type="checkbox" name="category[]" value="mouton" <?= in_array('mouton', $filtreCategorie) ? 'checked' : '' ?>> Mouton</label>
+                        <label><input type="checkbox" name="category[]" value="vache" <?= in_array('vache', $filtreCategorie) ? 'checked' : '' ?>> Vache</label>
+                        <label><input type="checkbox" name="category[]" value="chevre" <?= in_array('chevre', $filtreCategorie) ? 'checked' : '' ?>> Chèvre</label>
                     </div>
 
                     <!-- Prix -->
                     <div class="filter-group">
                         <h3>Prix</h3>
-                        <div class="price-range">
-                            <div class="price-inputs">
-                                <input type="number" placeholder="Min" class="price-input">
-                                <span>-</span>
-                                <input type="number" placeholder="Max" class="price-input">
-                            </div>
-                            <button type="button" class="apply-price">Appliquer</button>
-                        </div>
+                        <input type="number" name="min" placeholder="Min" value="<?= htmlspecialchars($filtreMinPrix) ?>">
+                        <input type="number" name="max" placeholder="Max" value="<?= htmlspecialchars($filtreMaxPrix) ?>">
                     </div>
 
                     <!-- Localisation -->
                     <div class="filter-group">
                         <h3>Localisation</h3>
-                        <select class="location-select">
-                            <option value="">Toutes les régions</option>
-                            <option value="dakar">Dakar</option>
-                            <option value="thies">Thiès</option>
-                            <option value="saint-louis">Saint-Louis</option>
-                            <option value="kolda">Kolda</option>
+                        <select name="region">
+                            <option value="">Toutes</option>
+                            <option value="dakar" <?= $filtreRegion == 'dakar' ? 'selected' : '' ?>>Dakar</option>
+                            <option value="thies" <?= $filtreRegion == 'thies' ? 'selected' : '' ?>>Thiès</option>
+                            <option value="saint-louis" <?= $filtreRegion == 'saint-louis' ? 'selected' : '' ?>>Saint-Louis</option>
+                            <option value="kolda" <?= $filtreRegion == 'kolda' ? 'selected' : '' ?>>Kolda</option>
                         </select>
                     </div>
 
                     <!-- Race -->
                     <div class="filter-group">
                         <h3>Race</h3>
-                        <div class="filter-options">
-                            <label class="filter-option">
-                                <input type="checkbox" name="race" value="ladoum">
-                                <span class="checkbox-custom"></span>
-                                Ladoum
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="race" value="bali-bali">
-                                <span class="checkbox-custom"></span>
-                                Bali-Bali
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="race" value="touabir">
-                                <span class="checkbox-custom"></span>
-                                Touabir
-                            </label>
-                        </div>
+                        <label><input type="checkbox" name="race[]" value="ladoum" <?= in_array('ladoum', $filtreRace) ? 'checked' : '' ?>> Ladoum</label>
+                        <label><input type="checkbox" name="race[]" value="bali-bali" <?= in_array('bali-bali', $filtreRace) ? 'checked' : '' ?>> Bali-Bali</label>
+                        <label><input type="checkbox" name="race[]" value="touabir" <?= in_array('touabir', $filtreRace) ? 'checked' : '' ?>> Touabir</label>
                     </div>
+
+                    <button type="submit">Filtrer</button>
                 </form>
             </aside>
 
             <!-- Liste des annonces -->
             <div class="annonces-content">
                 <div class="annonces-header">
-                    <div class="results-count">
-                        <span>450 annonces trouvées</span>
-                    </div>
-                    <div class="sort-options">
-                        <select class="sort-select">
-                            <option value="recent">Plus récentes</option>
-                            <option value="price-asc">Prix croissant</option>
-                            <option value="price-desc">Prix décroissant</option>
-                        </select>
-                    </div>
+                    <span><?= count($annoncesFiltrees) ?> annonces trouvées</span>
                 </div>
 
                 <div class="listings-grid">
-                    <?php for($i = 1; $i <= 9; $i++): ?>
-                    <div class="listing-card">
-                        <div class="listing-image">
-                            <img src="assets/images/animal<?= $i ?>.jpg" alt="Animal <?= $i ?>">
-                            <button class="favorite-btn" title="Ajouter aux favoris">
-                                <i class="far fa-heart"></i>
-                            </button>
-                        </div>
-                        <div class="listing-content">
-                            <h3 class="listing-title">Mouton Ladoum de race pure</h3>
-                            <div class="listing-price">250.000 FCFA</div>
-                            <div class="listing-details">
-                                <span class="listing-detail">
-                                    <i class="fas fa-weight"></i> 45 kg
-                                </span>
-                                <span class="listing-detail">
-                                    <i class="fas fa-calendar"></i> 18 mois
-                                </span>
-                            </div>
-                            <div class="listing-footer">
-                                <div class="listing-location">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    Dakar, Sénégal
+                    <?php if (empty($annoncesFiltrees)): ?>
+                        <p>Aucune annonce ne correspond à vos critères.</p>
+                    <?php else: ?>
+                        <?php foreach ($annoncesFiltrees as $annonce): ?>
+                            <div class="listing-card">
+                                <div class="listing-image">
+                                    <img src="assets/images/<?= $annonce['image'] ?>" alt="Animal <?= $annonce['id'] ?>">
                                 </div>
-                                <div class="listing-date">Il y a 2 jours</div>
+                                <div class="listing-content">
+                                    <h3>Mouton <?= ucfirst($annonce['race']) ?></h3>
+                                    <div class="listing-price"><?= number_format($annonce['prix'], 0, ',', ' ') ?> FCFA</div>
+                                    <div class="listing-details">
+                                        <span><?= $annonce['poids'] ?> kg</span> | 
+                                        <span><?= $annonce['age'] ?> mois</span>
+                                    </div>
+                                    <div class="listing-footer">
+                                        <span><?= ucfirst($annonce['region']) ?></span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <?php endfor; ?>
-                </div>
-
-                <!-- Pagination -->
-                <div class="pagination">
-                    <button class="page-btn prev" disabled>
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
-                    <span class="page-dots">...</span>
-                    <button class="page-btn">12</button>
-                    <button class="page-btn next">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<?php include 'components/footer.php'; ?> 
+<?php include 'components/footer.php'; ?>
