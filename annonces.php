@@ -2,6 +2,70 @@
 $pageTitle = "Annonces";
 $currentPage = 'annonces';
 include 'components/header.php';
+include 'db.php'; // Inclure la connexion à la base de données
+
+$whereClauses = [];
+$params = [];
+
+// Filtrer par catégorie
+if (!empty($_GET['category'])) {
+    $whereClauses[] = "categorie_id = ?";
+    $params[] = $_GET['category'];
+}
+
+// Filtrer par prix
+if (!empty($_GET['min_price']) && !empty($_GET['max_price'])) {
+    $whereClauses[] = "prix BETWEEN ? AND ?";
+    $params[] = $_GET['min_price'];
+    $params[] = $_GET['max_price'];
+}
+
+// Filtrer par localisation
+if (!empty($_GET['location'])) {
+    $whereClauses[] = "localisation_id = ?";
+    $params[] = $_GET['location'];
+}
+
+// Filtrer par race
+if (!empty($_GET['race'])) {
+    $whereClauses[] = "race_id = ?";
+    $params[] = $_GET['race'];
+}
+
+// Construire la requête SQL
+$sql = "SELECT 
+            annonces.id, 
+            annonces.titre, 
+            annonces.description, 
+            annonces.prix, 
+            annonces.poids, 
+            annonces.age, 
+            annonces.image, 
+            localisations.nom AS localisation, 
+            annonces.date_creation 
+        FROM annonces
+        JOIN localisations ON annonces.localisation_id = localisations.id";
+
+if (!empty($whereClauses)) {
+    $sql .= " WHERE " . implode(' AND ', $whereClauses);
+}
+
+$sql .= " ORDER BY annonces.date_creation DESC";
+
+// Pagination
+$limit = 10; // Nombre d'annonces par page
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+
+$sql .= " LIMIT $limit OFFSET $offset";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$annonces = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Calcul du nombre total d'annonces
+$totalAnnonces = $pdo->query("SELECT COUNT(*) FROM annonces")->fetchColumn();
+$totalPages = ceil($totalAnnonces / $limit);
 ?>
 
 <section class="annonces-page">
@@ -24,27 +88,21 @@ include 'components/header.php';
                     </button>
                 </div>
 
-                <form class="filters-form">
+                <form class="filters-form" method="GET">
                     <!-- Catégorie -->
                     <div class="filter-group">
                         <h3>Catégorie</h3>
-                        <div class="filter-options">
-                            <label class="filter-option">
-                                <input type="checkbox" name="category" value="mouton">
-                                <span class="checkbox-custom"></span>
-                                Moutons
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="category" value="vache">
-                                <span class="checkbox-custom"></span>
-                                Vaches
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="category" value="chevre">
-                                <span class="checkbox-custom"></span>
-                                Chèvres
-                            </label>
-                        </div>
+                        <select name="category" class="category-select">
+                            <option value="">Toutes les catégories</option>
+                            <?php
+                            $categories = $pdo->query("SELECT id, nom FROM categories")->fetchAll(PDO::FETCH_ASSOC);
+                            foreach ($categories as $categorie): ?>
+                                <option value="<?php echo $categorie['id']; ?>" 
+                                    <?php echo (!empty($_GET['category']) && $_GET['category'] == $categorie['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($categorie['nom']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
 
                     <!-- Prix -->
@@ -52,47 +110,45 @@ include 'components/header.php';
                         <h3>Prix</h3>
                         <div class="price-range">
                             <div class="price-inputs">
-                                <input type="number" placeholder="Min" class="price-input">
+                                <input type="number" name="min_price" placeholder="Min" class="price-input">
                                 <span>-</span>
-                                <input type="number" placeholder="Max" class="price-input">
+                                <input type="number" name="max_price" placeholder="Max" class="price-input">
                             </div>
-                            <button type="button" class="apply-price">Appliquer</button>
                         </div>
                     </div>
 
                     <!-- Localisation -->
                     <div class="filter-group">
                         <h3>Localisation</h3>
-                        <select class="location-select">
+                        <select name="location" class="location-select">
                             <option value="">Toutes les régions</option>
-                            <option value="dakar">Dakar</option>
-                            <option value="thies">Thiès</option>
-                            <option value="saint-louis">Saint-Louis</option>
-                            <option value="kolda">Kolda</option>
+                            <?php
+                            $localisations = $pdo->query("SELECT id, nom FROM localisations")->fetchAll(PDO::FETCH_ASSOC);
+                            foreach ($localisations as $localisation): ?>
+                                <option value="<?php echo $localisation['id']; ?>">
+                                    <?php echo htmlspecialchars($localisation['nom']); ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
                     <!-- Race -->
                     <div class="filter-group">
                         <h3>Race</h3>
-                        <div class="filter-options">
-                            <label class="filter-option">
-                                <input type="checkbox" name="race" value="ladoum">
-                                <span class="checkbox-custom"></span>
-                                Ladoum
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="race" value="bali-bali">
-                                <span class="checkbox-custom"></span>
-                                Bali-Bali
-                            </label>
-                            <label class="filter-option">
-                                <input type="checkbox" name="race" value="touabir">
-                                <span class="checkbox-custom"></span>
-                                Touabir
-                            </label>
-                        </div>
+                        <select name="race" class="race-select">
+                            <option value="">Toutes les races</option>
+                            <?php
+                            $races = $pdo->query("SELECT id, nom FROM races")->fetchAll(PDO::FETCH_ASSOC);
+                            foreach ($races as $race): ?>
+                                <option value="<?php echo $race['id']; ?>" 
+                                    <?php echo (!empty($_GET['race']) && $_GET['race'] == $race['id']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($race['nom']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
+
+                    <button type="submit" class="apply-filters">Appliquer les filtres</button>
                 </form>
             </aside>
 
@@ -100,66 +156,75 @@ include 'components/header.php';
             <div class="annonces-content">
                 <div class="annonces-header">
                     <div class="results-count">
-                        <span>450 annonces trouvées</span>
-                    </div>
-                    <div class="sort-options">
-                        <select class="sort-select">
-                            <option value="recent">Plus récentes</option>
-                            <option value="price-asc">Prix croissant</option>
-                            <option value="price-desc">Prix décroissant</option>
-                        </select>
+                        <span><?php echo $totalAnnonces; ?> annonces trouvées</span>
                     </div>
                 </div>
 
                 <div class="listings-grid">
-                    <?php for($i = 1; $i <= 9; $i++): ?>
-                    <div class="listing-card">
-                        <div class="listing-image">
-                            <img src="assets/images/animal<?= $i ?>.jpg" alt="Animal <?= $i ?>">
-                            <button class="favorite-btn" title="Ajouter aux favoris">
-                                <i class="far fa-heart"></i>
-                            </button>
-                        </div>
-                        <div class="listing-content">
-                            <h3 class="listing-title">Mouton Ladoum de race pure</h3>
-                            <div class="listing-price">250.000 FCFA</div>
-                            <div class="listing-details">
-                                <span class="listing-detail">
-                                    <i class="fas fa-weight"></i> 45 kg
-                                </span>
-                                <span class="listing-detail">
-                                    <i class="fas fa-calendar"></i> 18 mois
-                                </span>
-                            </div>
-                            <div class="listing-footer">
-                                <div class="listing-location">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    Dakar, Sénégal
+                    <?php if (!empty($annonces)): ?>
+                        <?php foreach ($annonces as $annonce): ?>
+                            <div class="listing-card">
+                                <div class="listing-image">
+                                    <?php 
+                                    $imagePath = "assets/images/" . htmlspecialchars($annonce['image']);
+                                    if (!file_exists($imagePath)) {
+                                        $imagePath = "assets/images/default.jpg"; // Image par défaut
+                                    }
+                                    ?>
+                                    <img src="<?php echo $imagePath; ?>" alt="<?php echo htmlspecialchars($annonce['titre']); ?>">
+                                    <form action="ajouter_favori.php" method="POST">
+                                        <input type="hidden" name="annonce_id" value="<?php echo $annonce['id']; ?>">
+                                        <button type="submit" class="favorite-btn" title="Ajouter aux favoris">
+                                            <i class="far fa-heart"></i>
+                                        </button>
+                                    </form>
                                 </div>
-                                <div class="listing-date">Il y a 2 jours</div>
+                                <div class="listing-content">
+                                    <h3 class="listing-title"><?php echo htmlspecialchars($annonce['titre']); ?></h3>
+                                    <div class="listing-price"><?php echo number_format($annonce['prix'], 0, ',', ' '); ?> FCFA</div>
+                                    <button class="details-button">
+                                        <a href="detail-produit.php?id=<?php echo $annonce['id']; ?>">Détails</a>
+                                    </button>
+                                    <div class="listing-footer">
+                                        <div class="listing-location">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <?php echo htmlspecialchars($annonce['localisation']); ?>
+                                        </div>
+                                        <div class="listing-date">
+                                            <?php echo date('d/m/Y', strtotime($annonce['date_creation'])); ?>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <?php endfor; ?>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>Aucune annonce trouvée.</p>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Pagination -->
                 <div class="pagination">
-                    <button class="page-btn prev" disabled>
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
-                    <span class="page-dots">...</span>
-                    <button class="page-btn">12</button>
-                    <button class="page-btn next">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+                    <?php if ($page > 1): ?>
+                        <a href="?page=<?php echo $page - 1; ?>" class="page-btn prev">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <a href="?page=<?php echo $i; ?>" class="page-btn <?php echo ($i === $page) ? 'active' : ''; ?>">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <?php if ($page < $totalPages): ?>
+                        <a href="?page=<?php echo $page + 1; ?>" class="page-btn next">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<?php include 'components/footer.php'; ?> 
+<?php include 'components/footer.php'; ?>
