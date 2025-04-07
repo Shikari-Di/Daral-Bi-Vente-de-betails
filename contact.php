@@ -28,8 +28,8 @@ include 'components/header.php';
                     <p>contact@daaralbi.sn<br>support@daaralbi.sn</p>
                 </div>
             </div>
-
-            <form class="contact-form">
+            <br>
+            <form class="contact-form" action="contact.php" method="POST">
                 <div class="form-group">
                     <label for="name">Nom complet</label>
                     <input type="text" id="name" name="name" required class="form-input">
@@ -55,5 +55,40 @@ include 'components/header.php';
         </div>
     </div>
 </section>
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $name = $_POST['name'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $subject = $_POST['subject'] ?? '';
+    $message = $_POST['message'] ?? '';
+
+    $host = 'localhost';
+    $dbname = 'daral_bi';
+    $username = 'root';
+    $password = '';
+
+    try {
+        $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $sql = "INSERT INTO contacts (nom, email, sujet, message) VALUES (:name, :email, :subject, :message)";
+        $stmt = $pdo->prepare($sql);
+
+        $stmt->execute([
+            ':name' => $name,
+            ':email' => $email,
+            ':subject' => $subject,
+            ':message' => $message
+        ]);
+
+        echo "<p class='flash-message success'>Données enregistrées avec succès !</p>";
+
+
+    } catch (PDOException $e) {
+        echo "<p class='flash-message error'>Erreur : " . $e->getMessage() . "</p>";
+    }
+}
+?>
+
 
 <?php include 'components/footer.php'; ?> 
