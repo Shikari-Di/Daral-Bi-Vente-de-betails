@@ -28,7 +28,7 @@ include 'components/header.php';
                     <p>contact@daaralbi.sn<br>support@daaralbi.sn</p>
                 </div>
             </div>
-
+            <br>
             <form class="contact-form">
                 <div class="form-group">
                     <label for="name">Nom complet</label>

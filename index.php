@@ -1,7 +1,16 @@
-<?php 
+<?php
+session_start();
+
 $pageTitle = "Accueil";
 $currentPage = 'home';
 include 'components/header.php';
+
+$cartItems = $_SESSION['cart'] ?? [];
+
+$total = 0;
+foreach ($cartItems as $item) {
+    $total += $item['price'] * $item['quantity'];
+}
 ?>
 
 <section class="hero">
@@ -55,6 +64,16 @@ include 'components/header.php';
                             Dakar, Sénégal
                         </div>
                         <div class="listing-actions">
+                            <form action="panier.php" method="post">
+                                <input type="hidden" name="product_id" value="<?= $i ?>">
+                                <input type="hidden" name="product_name" value="Mouton Ladoum de race pure">
+                                <input type="hidden" name="seller" value="Éleveur Exemple">
+                                <input type="hidden" name="price" value="250000">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="action-btn" title="Ajouter au Panier">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </form>
                             <button class="action-btn" title="Ajouter aux favoris">
                                 <i class="far fa-heart"></i>
                             </button>
@@ -80,7 +99,7 @@ include 'components/header.php';
             <p class="client-location">Dakar</p>
         </div>
         <div class="testimonial-card">
-            <img src="path/to/client2.jpg" alt="Client 2" class="client-image">
+            <img src="img\fatimasow.png" alt="Client 2" class="client-image">
             <p class="testimonial-text">"Plateforme très fiable et professionnelle."</p>
             <p class="client-name">Fatou Sow</p>
             <p class="client-location">Saint-Louis</p>
