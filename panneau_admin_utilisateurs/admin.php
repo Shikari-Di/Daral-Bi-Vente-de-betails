@@ -1,3 +1,21 @@
+<?php
+session_start();
+
+// Vérification si l'utilisateur est connecté en tant qu'admin
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header('Location: ../admin-login.php');
+    exit();
+}
+
+// Vérification du timeout de session (30 minutes)
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+    session_unset();
+    session_destroy();
+    header('Location: ../admin-login.php?timeout=1');
+    exit();
+}
+$_SESSION['last_activity'] = time();
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -95,13 +113,39 @@
         .admin-btn:hover {
             background: var(--primary);
         }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        .admin-welcome {
+            margin-bottom: 10px;
+            color: #666;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <a href="../admin-logout.php" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+    </a>
+    
     <div class="admin-container">
         <header class="admin-header">
             <h1>Panneau d'Administration</h1>
+            <p class="admin-welcome">Bienvenue, <?php echo htmlspecialchars($_SESSION['admin_username']); ?></p>
             <p>Gestion des annonces et utilisateurs</p>
         </header>
         
