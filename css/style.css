@@ -3394,4 +3394,26 @@ body {
 
 .favorite-btn.active i {
     color: white;
+<<<<<<<<< Temporary merge branch 1
+=========
+}
+
+/* Styles pour les messages d'erreur */
+.error-message {
+    color: #ff0000;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: block;
+    font-weight: 500;
+}
+
+.error-input {
+    border-color: #ff0000 !important;
+    background-color: #fff !important;
+}
+
+.error-input:focus {
+    border-color: #ff0000 !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 0, 0, 0.15) !important;
+>>>>>>>>> Temporary merge branch 2
 }

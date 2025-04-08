@@ -110,6 +110,14 @@ CREATE TABLE IF NOT EXISTS faq (
 -- Utilisateur
 INSERT INTO utilisateurs (nom, email, numero, mot_de_passe) 
 VALUES ('Admin', 'admin@example.com', '770000000', 'password123');
+=========
+INSERT INTO utilisateurs (nom, email, numero, mot_de_passe)
+SELECT * FROM (SELECT 'Admin', 'admin@example.com', '770000000', 'password123') AS tmp
+WHERE NOT EXISTS (
+    SELECT 1 FROM utilisateurs WHERE email = 'admin@example.com'
+) LIMIT 1;
+
+>>>>>>>>> Temporary merge branch 2
 
 -- Catégories
 INSERT INTO categories (nom) 
