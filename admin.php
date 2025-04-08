@@ -1,0 +1,169 @@
+<?php
+session_start();
+
+// Vérification si l'utilisateur est connecté en tant qu'admin
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+    header('Location: admin-login.php');
+    exit();
+}
+
+// Vérification du timeout de session (30 minutes)
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+    session_unset();
+    session_destroy();
+    header('Location: admin-login.php?timeout=1');
+    exit();
+}
+$_SESSION['last_activity'] = time();
+?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Daral_bi</title>
+    <style>
+        :root {
+            --primary: #2ecc71;
+            --secondary: #3498db;
+            --dark: #2c3e50;
+            --light: #f8f9fa;
+            --border: #dee2e6;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        
+        .admin-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .admin-header h1 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        
+        .admin-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .admin-menu {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .admin-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .admin-card i {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .admin-card h2 {
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .admin-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .admin-btn {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .admin-btn:hover {
+            background: var(--primary);
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        .admin-welcome {
+            margin-bottom: 10px;
+            color: #666;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <a href="admin-logout.php" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+    </a>
+    
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1>Panneau d'Administration</h1>
+            <p class="admin-welcome">Bienvenue, <?php echo htmlspecialchars($_SESSION['admin_username']); ?></p>
+            <p>Gestion des annonces et utilisateurs</p>
+        </header>
+        
+        <div class="admin-menu">
+            <div class="admin-card">
+                <i class="fas fa-users"></i>
+                <h2>Utilisateurs</h2>
+                <p>Gérer les comptes utilisateurs et leurs permissions</p>
+                <a href="panneau_admin_utilisateurs/utilisateurs.php" class="admin-btn">Accéder</a>
+            </div>
+            
+            <div class="admin-card">
+                <i class="fas fa-list"></i>
+                <h2>Annonces</h2>
+                <p>Modérer et gérer toutes les annonces publiées</p>
+                <a href="panneau_admin_utilisateurs/administrateur.php" class="admin-btn">Accéder</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

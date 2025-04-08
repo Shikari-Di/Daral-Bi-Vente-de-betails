@@ -4,9 +4,8 @@ require_once '../db.php'; // Connexion à la BDD
 $pageTitle = "Admin - Gestion des annonces";
 
 // Récupération des annonces
-$sql = "SELECT a.id, a.titre, a.prix, a.image, l.nom AS localisation
+$sql = "SELECT a.id, a.titre, a.prix, a.image
         FROM annonces a
-        INNER JOIN localisations l ON a.localisation_id = l.id
         ORDER BY a.date_creation DESC";
 $annonces = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -24,10 +23,9 @@ $annonces = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
             <thead>
                 <tr>
                     <th>#</th>
-            <th>Image</th>
+                    <th>Image</th>
                     <th>Titre</th>
                     <th>Prix</th>
-                    <th>Localisation</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -38,7 +36,6 @@ $annonces = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
                     <td><img src="img\<?= $annonce['image'] ?>" width="60" style="border-radius: 8px;"></td>
                     <td><?= htmlspecialchars($annonce['titre']) ?></td>
                     <td><?= number_format($annonce['prix'], 0, ',', ' ') ?> FCFA</td>
-                    <td><?= htmlspecialchars($annonce['localisation']) ?></td>
                     <td>
                         <a href="modifier_annonce.php?id=<?= $annonce['id'] ?>" class="btn btn-warning">✏️ Modifier</a>
                         <a href="panneau_admin_utilisateurs/supprimer_annonce.php?id=<?= $annonce['id'] ?>" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?')">🗑️ Supprimer</a>

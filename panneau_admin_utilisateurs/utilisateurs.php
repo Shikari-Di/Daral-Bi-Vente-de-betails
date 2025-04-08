@@ -1,9 +1,21 @@
 <?php
-include 'db.php'; // Assurez-vous que db.php contient la connexion à la base de données
+session_start();
+
+// Vérification si l'utilisateur est connecté en tant qu'admin
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+    header('Location: ../admin-login.php');
+    exit();
+}
+
+require_once '../db.php'; // Chemin correct vers db.php
 
 // Récupérer tous les utilisateurs
-$sql = "SELECT * FROM utilisateurs";
-$result = mysqli_query($conn, $sql);
+try {
+    $stmt = $pdo->query("SELECT * FROM utilisateurs");
+    $utilisateurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("Erreur lors de la récupération des utilisateurs : " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -11,7 +23,6 @@ $result = mysqli_query($conn, $sql);
 <head>
     <meta charset="UTF-8">
     <title>Gestion des utilisateurs - Admin</title>
-    <link rel="stylesheet" href="assets/css/admin.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,6 +58,8 @@ $result = mysqli_query($conn, $sql);
             color: white;
             text-decoration: none;
             border-radius: 4px;
+            margin-right: 5px;
+            display: inline-block;
         }
 
         a.btn:hover {
@@ -68,29 +81,26 @@ $result = mysqli_query($conn, $sql);
         }
 
         .btn-ajouter {
-            margin-top: 20px;
+            margin-bottom: 20px;
             display: inline-block;
             padding: 10px 15px;
-            background:rgb(0, 255, 128);
+            background:rgb(11, 150, 64);
             color: white;
             text-decoration: none;
             border-radius: 4px;
         }
 
         .btn-ajouter:hover {
-            background:rgba(42, 179, 0, 0.42);
-            
-
+            background:rgb(9, 121, 52);
         }
     </style>
 </head>
 <body>
-
     <h1>Gestion des utilisateurs</h1>
 
     <a href="ajouter_utilisateur.php" class="btn-ajouter">Ajouter un utilisateur</a>
 
-    <?php if (mysqli_num_rows($result) > 0): ?>
+    <?php if (!empty($utilisateurs)): ?>
         <table>
             <thead>
                 <tr>
@@ -102,27 +112,24 @@ $result = mysqli_query($conn, $sql);
                 </tr>
             </thead>
             <tbody>
-                <?php while ($user = mysqli_fetch_assoc($result)): ?>
+                <?php foreach ($utilisateurs as $user): ?>
                     <tr>
-                        <td><?= $user['id'] ?></td>
+                        <td><?= htmlspecialchars($user['id']) ?></td>
                         <td><?= htmlspecialchars($user['nom']) ?></td>
                         <td><?= htmlspecialchars($user['email']) ?></td>
                         <td><?= htmlspecialchars($user['type_compte']) ?></td>
                         <td>
-                            <a class="btn" href="modifier_utilisateur.php?id=<?= $user['id'] ?>">Modifier</a>
-                            <a class="btn" href="supprimer_utilisateur.php?id=<?= $user['id'] ?>" onclick="return confirm('Supprimer cet utilisateur ?')">Supprimer</a>
+                            <a class="btn" href="modifier_utilisateur.php?id=<?= htmlspecialchars($user['id']) ?>">Modifier</a>
+                            <a class="btn" href="supprimer_utilisateur.php?id=<?= htmlspecialchars($user['id']) ?>" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">Supprimer</a>
                         </td>
                     </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             </tbody>
         </table>
     <?php else: ?>
         <p>Aucun utilisateur trouvé.</p>
     <?php endif; ?>
 
-    <a href="admin.php" class="btn-retour">← Retour au panneau admin</a>
-
+    <a href="../admin.php" class="btn-retour">← Retour au panneau admin</a>
 </body>
 </html>
-
-<?php mysqli_close($conn); ?>

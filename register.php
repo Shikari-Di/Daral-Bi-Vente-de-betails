@@ -8,6 +8,9 @@ include 'components/header.php';
 // Récupérer les données sauvegardées si elles existent
 $formData = $_SESSION['register_data'] ?? [];
 
+// Supprimer les données de session après les avoir récupérées
+unset($_SESSION['register_data']);
+
 // Si le paramètre type=vendor est présent, forcer le type de compte à vendeur
 if (isset($_GET['type']) && $_GET['type'] === 'vendor') {
     $formData['account_type'] = 'vendor';

@@ -10,6 +10,34 @@ session_start([
     'use_strict_mode' => true
 ]);
 
+// Vérification si l'utilisateur est connecté en tant qu'admin
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+    header('Location: ../admin-login.php');
+    exit();
+}
+
+require_once '../db.php';
+
+// Récupérer l'ID de l'utilisateur à supprimer
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+
+if ($id) {
+    try {
+        // Supprimer l'utilisateur
+        $stmt = $pdo->prepare("DELETE FROM utilisateurs WHERE id = ?");
+        if ($stmt->execute([$id])) {
+            $_SESSION['message'] = "Utilisateur supprimé avec succès.";
+        } else {
+            $_SESSION['error'] = "Erreur lors de la suppression de l'utilisateur.";
+        }
+    } catch (PDOException $e) {
+        $_SESSION['error'] = "Erreur de base de données : " . $e->getMessage();
+    }
+}
+
+// Rediriger vers la liste des utilisateurs
+header('Location: utilisateurs.php');
+exit();
 
 // Chemin sécurisé pour l'inclusion
 $db_path = __DIR__.'/db.php';
