@@ -68,63 +68,6 @@ $totalAnnonces = $pdo->query("SELECT COUNT(*) FROM annonces")->fetchColumn();
 $totalPages = ceil($totalAnnonces / $limit);
 ?>
 
-<style>
-/* Style pour les cases à cocher personnalisées */
-.filter-option {
-    display: block;
-    position: relative;
-    padding-left: 25px;
-    margin-bottom: 10px;
-    cursor: pointer;
-}
-
-.filter-option input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-}
-
-.checkmark {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 18px;
-    width: 18px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-}
-
-.filter-option:hover input ~ .checkmark {
-    background-color: #f1f1f1;
-}
-
-.filter-option input:checked ~ .checkmark {
-    background-color: #4CAF50;
-    border-color: #4CAF50;
-}
-
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
-
-.filter-option input:checked ~ .checkmark:after {
-    display: block;
-}
-
-.filter-option .checkmark:after {
-    left: 6px;
-    top: 2px;
-    width: 5px;
-    height: 10px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
-</style>
-
 <section class="annonces-page">
     <div class="container">
         <div class="section-header">
@@ -139,9 +82,10 @@ $totalPages = ceil($totalAnnonces / $limit);
             <aside class="filters-sidebar">
                 <div class="filters-header">
                     <h2>Filtres</h2>
-                    <?php if(!empty($_GET)): ?>
-                        <a href="annonces.php" class="reset-filters">Réinitialiser</a>
-                    <?php endif; ?>
+                    <button class="reset-filters">
+                        <i class="fas fa-redo-alt"></i>
+                        Réinitialiser
+                    </button>
                 </div>
 
                 <form class="filters-form" method="GET">

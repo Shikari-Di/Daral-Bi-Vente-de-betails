@@ -16,7 +16,7 @@ include 'components/header.php';
             <?php for($i = 0; $i < 9; $i++): ?>
             <div class="testimonial-card">
                 <div class="testimonial-header">
-                    <img src="img\profileicon.jpg" alt="Client <?= $i+1 ?>" class="client-image">
+                    <img src="assets/images/testimonials/client<?= $i+1 ?>.jpg" alt="Client <?= $i+1 ?>" class="client-image">
                     <div class="client-info">
                         <h3 class="client-name"><?php 
                             $names = [
