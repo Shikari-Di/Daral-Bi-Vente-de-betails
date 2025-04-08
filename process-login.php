@@ -2,11 +2,18 @@
 session_start();
 require_once 'config/database.php';
 
+// Activer l'affichage des erreurs
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $mot_de_passe = $_POST['password'];
     $remember = isset($_POST['remember']) ? true : false;
-    $from_vendor = isset($_GET['from']) && $_GET['from'] === 'vendor';
+    $from_vendor = isset($_POST['from_vendor']) ? true : false;
+
+    // Debug
+    echo "Tentative de connexion pour l'email : $email<br>";
 
     $errors = [];
 
@@ -20,10 +27,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         try {
+            // Debug
+            echo "Recherche de l'utilisateur dans la base de données...<br>";
+
             // Recherche de l'utilisateur
-            $stmt = $pdo->prepare("SELECT id, email, mot_de_passe, type_compte, nom FROM utilisateurs WHERE email = ?");
+            $stmt = $pdo->prepare("SELECT id, email, mot_de_passe, type_compte FROM utilisateurs WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
+
+            if ($user) {
+                echo "Utilisateur trouvé :<br>";
+                print_r($user);
+            } else {
+                echo "Aucun utilisateur trouvé avec cet email<br>";
+            }
 
             if ($user && password_verify($mot_de_passe, $user['mot_de_passe'])) {
                 // Si l'utilisateur vient du bouton "Devenir vendeur" et n'est pas un vendeur
@@ -34,27 +51,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     exit();
                 }
 
-                // Connexion réussie
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_name'] = $user['nom'];
-                $_SESSION['user_type'] = $user['type_compte'];
+                echo "Mot de passe vérifié avec succès<br>";
 
-                // Gestion du "Se souvenir de moi"
+                // Création de la session
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['type_compte'] = $user['type_compte'];
+
+                echo "Session créée :<br>";
+                print_r($_SESSION);
+
+                // Si "Se souvenir de moi" est coché, créer un cookie
                 if ($remember) {
                     $token = bin2hex(random_bytes(32));
-                    $expiry = date('Y-m-d H:i:s', strtotime('+30 days'));
-                    
+                    $expiry = time() + (30 * 24 * 60 * 60); // 30 jours
+
+                    // Stocker le token dans la base de données
                     $stmt = $pdo->prepare("UPDATE utilisateurs SET remember_token = ?, token_expiry = ? WHERE id = ?");
-                    $stmt->execute([$token, $expiry, $user['id']]);
-                    
-                    setcookie('remember_token', $token, time() + (30 * 24 * 60 * 60), '/', '', true, true);
+                    $stmt->execute([$token, date('Y-m-d H:i:s', $expiry), $user['id']]);
+
+                    // Créer le cookie
+                    setcookie('remember_token', $token, $expiry, '/', '', true, true);
                 }
 
                 // Redirection selon le type de compte
                 if ($user['type_compte'] === 'vendeur') {
+                    echo "Redirection vers le dashboard vendeur...<br>";
                     header('Location: dashboard-vendeur.php');
                 } else {
+                    echo "Redirection vers la page d'accueil...<br>";
                     header('Location: index.php');
                 }
                 exit();
@@ -62,11 +87,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = "Email ou mot de passe incorrect";
             }
         } catch (PDOException $e) {
+            echo "Erreur PDO : " . $e->getMessage() . "<br>";
             $errors[] = "Une erreur est survenue lors de la connexion";
         }
     }
 
+    // Si des erreurs sont présentes, les stocker en session et rediriger
     if (!empty($errors)) {
+        echo "Erreurs :<br>";
+        print_r($errors);
         $_SESSION['login_errors'] = $errors;
         $_SESSION['login_data'] = ['email' => $email];
         header('Location: login.php' . ($from_vendor ? '?from=vendor' : ''));
@@ -75,4 +104,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     header('Location: login.php');
     exit();
-}
+} 

@@ -2,6 +2,10 @@
 session_start();
 require_once 'config/database.php';
 
+$currentPage = 'dashboard-vendeur';
+
+
+
 // Vérification de la connexion
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['error_message'] = "Vous devez être connecté pour accéder au tableau de bord.";
@@ -14,6 +18,13 @@ $user_info = [];
 $annonces = [];
 $message = '';
 $error = '';
+
+// Initialiser la variable $stats avec des valeurs par défaut
+$stats = [
+    'total_annonces' => 0,
+    'annonces_recentes' => 0,
+    'total_vues' => 0
+];
 
 try {
     // Récupérer les informations de l'utilisateur
@@ -57,6 +68,15 @@ try {
     ");
     $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Si aucun résultat n'est trouvé, les valeurs par défaut sont utilisées
+    if (!$stats) {
+        $stats = [
+            'total_annonces' => 0,
+            'annonces_recentes' => 0,
+            'total_vues' => 0
+        ];
+    }
 
 } catch (PDOException $e) {
     $error = "Erreur lors de la récupération des données : " . $e->getMessage();
@@ -251,12 +271,15 @@ if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
                                         <td><?php echo $annonce['vues_7jours']; ?></td>
                                         <td><?php echo date('d/m/Y', strtotime($annonce['date_creation'])); ?></td>
                                         <td class="text-center">
-                                            <a href="modifier-annonce.php?id=<?php echo $annonce['id']; ?>" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-edit"></i> Modifier
+                                            <a href="modifier-annonce.php?id=<?php echo $annonce['id']; ?>" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-pencil-alt"></i> Modifier
                                             </a>
-                                            <button onclick="confirmerSuppression(<?php echo $annonce['id']; ?>)" class="btn btn-danger btn-sm">
-                                                <i class="fas fa-trash"></i> Supprimer
-                                            </button>
+                                            <form method="POST" action="dashboard-vendeur.php" style="display:inline;">
+                                                <input type="hidden" name="annonce_id" value="<?php echo $annonce['id']; ?>">
+                                                <button type="submit" name="delete_annonce" class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash-alt"></i> Supprimer
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -268,14 +291,6 @@ if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
         </div>
     </div>
 
-    <?php include 'components/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    function confirmerSuppression(annonceId) {
-        if (confirm("Êtes-vous sûr de vouloir supprimer cette annonce ? Cette action est irréversible.")) {
-            window.location.href = 'supprimer-annonce.php?id=' + annonceId;
-        }
-    }
-    </script>
 </body>
-</html> 
+</html>
