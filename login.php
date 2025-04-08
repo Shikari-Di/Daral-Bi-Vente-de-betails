@@ -8,7 +8,7 @@ include 'components/header.php';
     <div class="auth-box">
         <h1>Connexion</h1>
         
-        <form class="auth-form" action="login_process.php" method="POST">
+        <form class="auth-form" action="process-login.php" method="POST">
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" class="form-input" required>

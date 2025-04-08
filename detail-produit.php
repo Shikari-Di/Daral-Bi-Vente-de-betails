@@ -7,7 +7,7 @@ include 'config/database.php'; // Fichier de connexion à la base de données
 $productID = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 try {
-    $query = $db->prepare("
+    $query = $pdo->prepare("
         SELECT 
             annonces.*, 
             localisations.nom AS localisation, 
