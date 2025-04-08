@@ -1,0 +1,29 @@
+.linksH {
+    color: black;
+    display: inline-block;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.linksH:hover {
+    color: rgb(120, 235, 5); /* Couleur au survol */
+}
+header {
+    display: flex; /* Active Flexbox */
+    align-items: center; /* Aligne verticalement */
+    justify-content: space-between; /* Espacement entre l'image et les liens */
+    padding: 0px 10px; /* Ajoute un peu d'espace */
+}
+
+header img {
+    height: 110px; /* Ajuste la taille de l'image */
+    width: auto; /* Garde les proportions */
+}
+
+header div {
+    display: flex; /* Met les liens sur une ligne */
+    gap: 30px; /* Espacement entre les liens */
+}

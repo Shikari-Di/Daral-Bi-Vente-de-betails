@@ -105,16 +105,50 @@ CREATE TABLE IF NOT EXISTS faq (
     reponse TEXT NOT NULL
 );
 
+-- Table des commandes
+CREATE TABLE IF NOT EXISTS commandes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    annonce_id INT,
+    acheteur_id INT,
+    montant_total DECIMAL(10,2),
+    statut ENUM('En attente', 'Confirmé', 'En livraison', 'Livré', 'Annulé'),
+    mode_paiement VARCHAR(50),
+    date_commande DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (annonce_id) REFERENCES annonces(id),
+    FOREIGN KEY (acheteur_id) REFERENCES utilisateurs(id)
+);
+
+-- Table des contacts des vendeurs
+CREATE TABLE IF NOT EXISTS contacts_vendeur (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    utilisateur_id INT NOT NULL,
+    telephone VARCHAR(20) NOT NULL,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (utilisateur_id) REFERENCES utilisateurs(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_utilisateur (utilisateur_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 
+
+-- Table des vues d'annonces
+CREATE TABLE IF NOT EXISTS vues_annonces (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    annonce_id INT NOT NULL,
+    date_vue TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (annonce_id) REFERENCES annonces(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci; 
+
 -- Insertion des données initiales
 
 -- Utilisateur
 INSERT INTO utilisateurs (nom, email, numero, mot_de_passe) 
 VALUES ('Admin', 'admin@example.com', '770000000', 'password123');
+=========
+INSERT INTO utilisateurs (nom, email, numero, mot_de_passe)
 SELECT * FROM (SELECT 'Admin', 'admin@example.com', '770000000', 'password123') AS tmp
 WHERE NOT EXISTS (
     SELECT 1 FROM utilisateurs WHERE email = 'admin@example.com'
 ) LIMIT 1;
 
+>>>>>>>>> Temporary merge branch 2
 
 -- Catégories
 INSERT INTO categories (nom) 

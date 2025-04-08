@@ -7,7 +7,7 @@ include 'components/header.php';
 $order = [
     'id' => '12345',
     'product_name' => 'Mouton Ladoum',
-    'seller' => 'Éleveur Exemple',
+    'seller' => 'Éleveur Example',
     'price' => 250000,
     'delivery_fee' => 15000,
     'total' => 265000,
@@ -94,7 +94,7 @@ $order = [
                     <div class="method-content">
                         <div class="mobile-operators">
                             <button class="operator-btn active" data-operator="orange">
-                                <img src="img/orange_money.png" alt="Orange Money">
+                                <img src="img/orange_money.jpeg" alt="Orange Money">
                                 Orange Money
                             </button>
                             <button class="operator-btn" data-operator="wave">

@@ -60,7 +60,7 @@ try {
             </div>
             
             <div class="product-price">
-                <span class="price-amount">FCFA <?php echo number_format($product['prix'], 0, ',', ' '); ?></span>
+                <span class="price"><?php echo number_format($product['prix'], 0, ',', ' '); ?> FCFA</span>
             </div>
 
             <div class="product-location">
@@ -94,6 +94,24 @@ try {
                     <span class="label">Catégorie :</span>
                     <span class="value"><?php echo htmlspecialchars($product['categorie']); ?></span>
                 </div>
+            </div>
+
+            <div class="product-actions">
+                <form method="POST" action="ajouter-au-panier.php" class="mb-3">
+                    <input type="hidden" name="annonce_id" value="<?php echo $product['id']; ?>">
+                    <button type="submit" class="action-button cart-button">
+                        <i class="fas fa-cart-plus"></i> 
+                        <span>Ajouter au panier</span>
+                    </button>
+                </form>
+                
+                <form method="POST" action="achat-direct.php">
+                    <input type="hidden" name="annonce_id" value="<?php echo $product['id']; ?>">
+                    <button type="submit" class="action-button buy-button">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Acheter maintenant</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -167,6 +185,78 @@ try {
         Retour à l'accueil
     </a>
 </div>
+
+<style>
+.product-actions {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-button i {
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.cart-button {
+    background-color: #fff;
+    color: #3498db;
+    border: 2px solid #3498db;
+    margin-bottom: 15px;
+}
+
+.cart-button:hover {
+    background-color: #3498db;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
+
+.buy-button {
+    background-color: #2ecc71;
+    color: #fff;
+    border: 2px solid #2ecc71;
+}
+
+.buy-button:hover {
+    background-color: #27ae60;
+    border-color: #27ae60;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+}
+
+.product-actions form {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .action-button {
+        padding: 12px 20px;
+        font-size: 1em;
+    }
+    
+    .product-actions {
+        padding: 15px;
+        margin-top: 20px;
+    }
+}
+</style>
 
 <?php 
 include 'components/footer.php'; 
