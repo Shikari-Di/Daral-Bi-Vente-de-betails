@@ -26,13 +26,14 @@ try {
         exit();
     }
 
-    // Récupérer les annonces de l'utilisateur
+    // Récupérer les annonces de l'utilisateur avec les vues
     $stmt = $pdo->prepare("
         SELECT a.*, 
                l.nom as localisation_nom,
                c.nom as categorie_nom,
                r.nom as race_nom,
-               (SELECT COUNT(*) FROM vues_annonces WHERE annonce_id = a.id) as nombre_vues
+               (SELECT COUNT(*) FROM vues_annonces WHERE annonce_id = a.id) as nombre_vues,
+               (SELECT COUNT(*) FROM vues_annonces WHERE annonce_id = a.id AND date_vue >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as vues_7jours
         FROM annonces a
         LEFT JOIN localisations l ON a.localisation_id = l.id
         LEFT JOIN categories c ON a.categorie_id = c.id
@@ -47,11 +48,14 @@ try {
     $stmt = $pdo->prepare("
         SELECT 
             COUNT(*) as total_annonces,
-            SUM(CASE WHEN date_creation >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as annonces_recentes
+            SUM(CASE WHEN date_creation >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as annonces_recentes,
+            (SELECT COUNT(*) FROM vues_annonces va 
+             JOIN annonces a ON va.annonce_id = a.id 
+             WHERE a.utilisateur_id = ?) as total_vues
         FROM annonces 
         WHERE utilisateur_id = ?
     ");
-    $stmt->execute([$_SESSION['user_id']]);
+    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
     $stats = $stmt->fetch(PDO::FETCH_ASSOC);
 
 } catch (PDOException $e) {
@@ -61,6 +65,7 @@ try {
 // Traitement de la suppression d'une annonce
 if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
     try {
+        // Vérifier que l'annonce appartient bien à l'utilisateur
         $stmt = $pdo->prepare("SELECT image FROM annonces WHERE id = ? AND utilisateur_id = ?");
         $stmt->execute([$_POST['annonce_id'], $_SESSION['user_id']]);
         $annonce = $stmt->fetch();
@@ -78,6 +83,8 @@ if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
             $message = "Annonce supprimée avec succès";
             header("Location: dashboard-vendeur.php");
             exit();
+        } else {
+            $error = "Vous n'êtes pas autorisé à supprimer cette annonce";
         }
     } catch (PDOException $e) {
         $error = "Erreur lors de la suppression de l'annonce : " . $e->getMessage();
@@ -95,7 +102,6 @@ if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* ... existing styles ... */
         .user-welcome {
             background-color: var(--primary-color);
             color: white;
@@ -110,6 +116,36 @@ if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
         .user-welcome p {
             margin: 5px 0 0 0;
             opacity: 0.9;
+        }
+        .stats-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .stats-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .annonce-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .action-buttons {
+            white-space: nowrap;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+        }
+        .empty-state i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -164,12 +200,7 @@ if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
             <div class="col-md-4">
                 <div class="stats-card">
                     <h5><i class="fas fa-eye me-2"></i>Vues totales</h5>
-                    <div class="stats-number">
-                        <?php 
-                        $total_vues = array_sum(array_column($annonces, 'nombre_vues'));
-                        echo $total_vues;
-                        ?>
-                    </div>
+                    <div class="stats-number"><?php echo $stats['total_vues']; ?></div>
                 </div>
             </div>
         </div>
@@ -199,7 +230,7 @@ if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
                                     <th>Localisation</th>
                                     <th>Catégorie</th>
                                     <th>Race</th>
-                                    <th>Vues</th>
+                                    <th>Vues (7j)</th>
                                     <th>Date</th>
                                     <th>Actions</th>
                                 </tr>
@@ -217,20 +248,15 @@ if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
                                         <td><?php echo htmlspecialchars($annonce['localisation_nom']); ?></td>
                                         <td><?php echo htmlspecialchars($annonce['categorie_nom']); ?></td>
                                         <td><?php echo htmlspecialchars($annonce['race_nom']); ?></td>
-                                        <td><?php echo $annonce['nombre_vues'] ?? 0; ?></td>
+                                        <td><?php echo $annonce['vues_7jours']; ?></td>
                                         <td><?php echo date('d/m/Y', strtotime($annonce['date_creation'])); ?></td>
-                                        <td class="action-buttons">
-                                            <a href="modifier-annonce.php?id=<?php echo $annonce['id']; ?>" 
-                                               class="btn btn-sm btn-primary">
-                                                <i class="fas fa-edit"></i>
+                                        <td class="text-center">
+                                            <a href="modifier-annonce.php?id=<?php echo $annonce['id']; ?>" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-edit"></i> Modifier
                                             </a>
-                                            <form method="POST" class="d-inline" 
-                                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?');">
-                                                <input type="hidden" name="annonce_id" value="<?php echo $annonce['id']; ?>">
-                                                <button type="submit" name="delete_annonce" class="btn btn-sm btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                            <button onclick="confirmerSuppression(<?php echo $annonce['id']; ?>)" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i> Supprimer
+                                            </button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -244,5 +270,12 @@ if (isset($_POST['delete_annonce']) && isset($_POST['annonce_id'])) {
 
     <?php include 'components/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function confirmerSuppression(annonceId) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer cette annonce ? Cette action est irréversible.")) {
+            window.location.href = 'supprimer-annonce.php?id=' + annonceId;
+        }
+    }
+    </script>
 </body>
 </html> 
