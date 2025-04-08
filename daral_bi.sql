@@ -139,16 +139,31 @@ CREATE TABLE IF NOT EXISTS vues_annonces (
 -- Insertion des données initiales
 
 -- Utilisateur
-INSERT INTO utilisateurs (nom, email, numero, mot_de_passe) 
-VALUES ('Admin', 'admin@example.com', '770000000', 'password123');
-=========
-INSERT INTO utilisateurs (nom, email, numero, mot_de_passe)
-SELECT * FROM (SELECT 'Admin', 'admin@example.com', '770000000', 'password123') AS tmp
-WHERE NOT EXISTS (
-    SELECT 1 FROM utilisateurs WHERE email = 'admin@example.com'
-) LIMIT 1;
 
->>>>>>>>> Temporary merge branch 2
+-- Création de la table des administrateurs
+CREATE TABLE IF NOT EXISTS administrateurs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    security_code VARCHAR(50) NOT NULL
+);
+
+-- Insertion d'un administrateur par défaut
+-- username : admin
+-- Mot de passe : admin123
+-- Code de sécurité : 123456
+INSERT INTO administrateurs (username, password, security_code)
+VALUES ('admin', 'admin123', 'DARAL2024'); 
+
+INSERT INTO utilisateurs (
+    id, nom, email, numero, mot_de_passe,
+    type_compte, nom_entreprise, adresse_entreprise, numero_ninea,
+    remember_token, token_expiry, reset_token, reset_token_expiry, date_inscription
+) VALUES (
+    1, 'Admin', 'admin@example.com', '770000000', 'password123',
+    'vendeur', NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL, NOW()
+);
 
 -- Catégories
 INSERT INTO categories (nom) 
