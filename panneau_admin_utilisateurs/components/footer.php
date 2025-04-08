@@ -1,8 +1,19 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>footer</title>
+    </head>
+    <body>
+        <link rel="stylesheet" href="css/style.css">
+    </body>
+    </html>
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-brand">
-                    <img src="img\DaraalBILogo.jpeg" alt="Daaral Bi" class="footer-logo">
+                    <img src="assets/images/logo-white.png" alt="Daaral Bi" class="footer-logo">
                     <p class="footer-description">
                         Daaral Bi est votre marketplace de confiance pour l'achat et la vente de bétail au Sénégal. 
                         Nous connectons éleveurs et acheteurs dans un environnement sécurisé et professionnel.

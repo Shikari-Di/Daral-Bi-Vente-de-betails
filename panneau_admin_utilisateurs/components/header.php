@@ -1,39 +1,11 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo isset($pageTitle) ? $pageTitle . ' - ' : ''; ?>Daraal Bi - Marketplace de bétail</title>
+    <title>Daraal Bi - Marketplace de bétail</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px;
-        }
-
-        .user-name {
-            color: #333;
-            font-weight: 500;
-        }
-
-        .logout-link {
-            color: #dc3545;
-            text-decoration: none;
-            margin-left: 10px;
-        }
-
-        .logout-link:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
     <header class="header">
@@ -42,13 +14,12 @@ if (session_status() === PHP_SESSION_NONE) {
                 <img src="img\DaraalBILogo.jpeg" alt="Daraal Bi Logo" class="logo-img">
             </a>
 
-            <form class="search-bar" action="recherche.php" method="GET">
-              <input type="text" name="q" placeholder="Rechercher un animal..." class="search-input" required>
-                  <button type="submit" class="search-button">
-                     <i class="fas fa-search"></i>
-                  </button>
-            </form>
-
+            <div class="search-bar">
+                <input type="text" placeholder="Rechercher un animal..." class="search-input">
+                <button type="submit" class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
 
             <button class="menu-toggle">
                 <i class="fas fa-bars"></i>
@@ -70,20 +41,12 @@ if (session_status() === PHP_SESSION_NONE) {
                     <li><a href="annonces.php" class="nav-link <?php echo ($currentPage === 'annonces') ? 'active' : ''; ?>">Annonces</a></li>
                     <li><a href="temoignages.php" class="nav-link <?php echo ($currentPage === 'temoignages') ? 'active' : ''; ?>">Témoignages</a></li>
                     <li><a href="contact.php" class="nav-link <?php echo ($currentPage === 'contact') ? 'active' : ''; ?>">Contact</a></li>
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <li class="user-info">
-                            <i class="fas fa-user"></i>
-                            <span class="user-name"><?php echo htmlspecialchars($_SESSION['email']); ?></span>
-                            <a href="logout.php" class="logout-link">
-                                <i class="fas fa-sign-out-alt"></i> Déconnexion
-                            </a>
-                        </li>
-                    <?php else: ?>
-                        <li><a href="login.php" class="nav-link connect-button">Connexion</a></li>
-                    <?php endif; ?>
+                    <li><a href="login.php" class="nav-link connect-button">Connexion</a></li>
                 </ul>
+
             </nav>
         </div>
     </header>
+
 </body>
 </html> 
