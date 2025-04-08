@@ -15,9 +15,9 @@ include 'components/header.php';
             <i class="fas fa-shopping-cart"></i>
             Acheter maintenant
         </a>
-        <a href="devenir-vendeur.php" class="button button-secondary">
+        <a href="login.php" class="button button-secondary">
             <i class="fas fa-store"></i>
-            Devenir vendeur
+            Se connecter
         </a>
     </div>
 </section>
